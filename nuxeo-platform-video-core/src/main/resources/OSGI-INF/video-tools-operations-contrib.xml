@@ -1,0 +1,13 @@
+<component name="org.nuxeo.video.tools.operations">
+
+  <extension target="org.nuxeo.ecm.core.operation.OperationServiceComponent"
+    point="operations" >
+      <operation class="org.nuxeo.ecm.platform.video.tools.operations.ExtractClosedCaptions" />
+      <operation class="org.nuxeo.ecm.platform.video.tools.operations.Slice" />
+      <operation class="org.nuxeo.ecm.platform.video.tools.operations.SliceInParts" />
+      <operation class="org.nuxeo.ecm.platform.video.tools.operations.Concat" />
+      <operation class="org.nuxeo.ecm.platform.video.tools.operations.Convert" />
+      <operation class="org.nuxeo.ecm.platform.video.tools.operations.Watermark" />
+   </extension>
+    
+</component>
