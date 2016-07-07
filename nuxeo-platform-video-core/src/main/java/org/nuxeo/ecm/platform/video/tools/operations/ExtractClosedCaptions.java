@@ -1,29 +1,34 @@
 /*
- * (C) Copyright ${year} Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Contributors:
- *     thibaud
+ *     Thibaud Arguillere
+ *     Ricardo Dias
  */
-
 package org.nuxeo.ecm.platform.video.tools.operations;
 
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.lang.StringUtils;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
 import org.nuxeo.ecm.automation.core.annotations.Param;
+import org.nuxeo.ecm.automation.core.collectors.BlobCollector;
+import org.nuxeo.ecm.automation.core.collectors.DocumentModelCollector;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
@@ -32,12 +37,10 @@ import org.nuxeo.ecm.platform.video.tools.CCExtractor;
 import org.nuxeo.runtime.api.Framework;
 
 /**
- * Returns a Blob containing the closed captions using <code>ccextractor</code>
- * (see its documentation about <code>outFormat</code>). If <code>startAt</code>
- * /<code>endAt</code> are empty, the whole movie is handled. If the input is a
- * document, you can use <code>xpath</code> (ignored if the input is a blob)
+ * @since 8.4
  */
-@Operation(id = ExtractClosedCaptions.ID, category = Constants.CAT_CONVERSION, label = "Video: Extract Closed Captions", description = "Returns a Blob containing the closed captions using <code>ccextractor</code> (see its documentation about <code>outFormat</code>). If <code>startAt</code>/<code>endAt</code> are empty, the whole movie is handled. If the input is a document, you can use <code>xpath</code> (ignored if the input is a blob)")
+@Operation(id = ExtractClosedCaptions.ID, category = Constants.CAT_CONVERSION, label = "Extracts Closed Captions from the Video.", description = "Returns a Blob containing the closed captions using <code>ccextractor</code> (see its documentation about <code>outFormat</code>). If <code>startAt</code>/<code>endAt</code> are empty, the whole movie is handled. If the input is a document, you can use <code>xpath</code> (ignored if the input is a blob)", aliases = {
+        "Video.ExtractClosedCaptions" })
 public class ExtractClosedCaptions {
 
     public static final String ID = "Video.ExtractClosedCaptions";
@@ -51,36 +54,27 @@ public class ExtractClosedCaptions {
     @Param(name = "endAt", required = false)
     protected String endAt;
 
-    @Param(name = "neverReturnNull", required = false, values = { "false" })
-    protected boolean neverReturnNull;
-
     @Param(name = "xpath", required = false, values = { "file:content" })
     protected String xpath;
 
-    @OperationMethod
-    public Blob run(DocumentModel inDoc) throws IOException,
-            CommandNotAvailable {
-
-        return run((Blob) inDoc.getPropertyValue("file:content"));
-
+    @OperationMethod(collector = DocumentModelCollector.class)
+    public Blob run(DocumentModel input) throws IOException, CommandNotAvailable {
+        String blobPath = (!StringUtils.isEmpty(xpath))? xpath : "file:content";
+        return run((Blob) input.getPropertyValue(blobPath));
     }
 
-    @OperationMethod
-    public Blob run(Blob inBlob) throws IOException, CommandNotAvailable {
+    @OperationMethod(collector = BlobCollector.class)
+    public Blob run(Blob input) throws IOException, CommandNotAvailable {
+        CCExtractor cce = new CCExtractor(input, startAt, endAt);
+        Blob result = cce.extractCC(outFormat);
 
-        Blob result = null;
-
-        CCExtractor cce = new CCExtractor(inBlob, startAt, endAt);
-        result = cce.extractCC(outFormat);
-
-        if (result == null && neverReturnNull) {
-            File tempFile = File.createTempFile("NxVT-", "txt");
+        if (result == null) {
+            File tempFile = Framework.createTempFile("NxVT-", "txt");
             tempFile.deleteOnExit();
             Framework.trackFile(tempFile, this);
-            FileBlob fb = new FileBlob(tempFile);
-            fb.setMimeType("text/plain");
-            fb.setFilename(inBlob.getFilename() + "-noCC.txt");
-            return fb;
+            result = new FileBlob(tempFile);
+            result.setMimeType("text/plain");
+            result.setFilename(input.getFilename() + "-noCC.txt");
         }
 
         return result;

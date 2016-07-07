@@ -7,7 +7,7 @@
       <operation class="org.nuxeo.ecm.platform.video.tools.operations.SliceInParts" />
       <operation class="org.nuxeo.ecm.platform.video.tools.operations.Concat" />
       <operation class="org.nuxeo.ecm.platform.video.tools.operations.Convert" />
-      <operation class="org.nuxeo.ecm.platform.video.tools.operations.Watermark" />
+      <operation class="org.nuxeo.ecm.platform.video.tools.operations.AddWatermark" />
    </extension>
     
 </component>

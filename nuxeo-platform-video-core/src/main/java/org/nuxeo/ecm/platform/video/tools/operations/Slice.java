@@ -1,42 +1,44 @@
 /*
- * (C) Copyright 2014 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Contributors:
  *     Thibaud Arguillere
+ *     Ricardo Dias
  */
-
 package org.nuxeo.ecm.platform.video.tools.operations;
 
 import java.io.IOException;
 
+import org.apache.commons.lang.StringUtils;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
 import org.nuxeo.ecm.automation.core.annotations.Param;
 import org.nuxeo.ecm.automation.core.collectors.BlobCollector;
+import org.nuxeo.ecm.automation.core.collectors.DocumentModelCollector;
 import org.nuxeo.ecm.core.api.Blob;
+import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.platform.commandline.executor.api.CommandNotAvailable;
 import org.nuxeo.ecm.platform.video.tools.VideoSlicer;
 
 /**
- * Slice the input blob starting at <code>start</code>, for
- * <code>duration</code>. A specific command line can be used. For example, use
- * videoSlicerByCopy for very fast cut (because ffmpeg does not re-encode the
- * video) if you know there will be no frame or timestamp issue in the sliced
- * video
+ * @since 8.4
  */
-@Operation(id = Slice.ID, category = Constants.CAT_CONVERSION, label = "Video: Slice", description = "Slice the input blob starting at <code>start</code>, for <code>duration</code>. A specific converter can be used. For example, use videoSlicerByCopy for very fast cut (because ffmpeg does not re-encode the video) if you know there will be no frame or timestamp issue in the sliced video")
+@Operation(id = Slice.ID, category = Constants.CAT_CONVERSION, label = "Slice the Video for a given duration and start time.", description = "Slice the input blob starting at <code>start</code>, for <code>duration</code>. A specific converter can be used. For example, use videoSlicerByCopy for very fast cut (because ffmpeg does not re-encode the video) if you know there will be no frame or timestamp issue in the sliced video", aliases = {
+        "Video.Slice" })
 public class Slice {
 
     public static final String ID = "Video.Slice";
@@ -50,22 +52,26 @@ public class Slice {
     @Param(name = "commandLine", required = false, values = { "videoSlicer" })
     protected String commandLine;
 
+    @Param(name = "xpath", required = false, values = { "file:content" })
+    protected String xpath;
+
+    @OperationMethod(collector = DocumentModelCollector.class)
+    public Blob run(DocumentModel input) throws IOException, CommandNotAvailable {
+        String blobPath = (!StringUtils.isEmpty(xpath)) ? xpath : "file:content";
+        return run((Blob) input.getPropertyValue(blobPath));
+    }
+
     @OperationMethod(collector = BlobCollector.class)
-    public Blob run(Blob inBlob) throws NuxeoException {
-
-        Blob result = null;
-
-        VideoSlicer slicer = new VideoSlicer(inBlob);
+    public Blob run(Blob input) throws NuxeoException {
+        VideoSlicer videoSlicer = new VideoSlicer(input);
         if (commandLine != null && !commandLine.isEmpty()) {
-            slicer.setCommandLineName(commandLine);
+            videoSlicer.setCommandLineName(commandLine);
         }
         try {
-            result = slicer.slice(start, duration);
+            return videoSlicer.slice(start, duration);
         } catch (IOException | CommandNotAvailable e) {
             throw new NuxeoException(e);
         }
-
-        return result;
     }
 
 }
