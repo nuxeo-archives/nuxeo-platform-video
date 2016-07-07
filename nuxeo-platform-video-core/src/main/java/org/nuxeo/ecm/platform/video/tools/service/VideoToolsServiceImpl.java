@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.platform.commandline.executor.api.CommandNotAvailable;
+import org.nuxeo.ecm.platform.video.tools.VideoSlicer;
 import org.nuxeo.ecm.platform.video.tools.VideoToolsService;
 import org.nuxeo.ecm.platform.video.tools.VideoWatermarker;
 import org.nuxeo.runtime.model.ComponentContext;
@@ -54,12 +55,19 @@ public class VideoToolsServiceImpl extends DefaultComponent implements VideoTool
 
     @Override
     public Blob slice(Blob video, String start, String duration) {
-        return null;
+        VideoSlicer videoSlicer = new VideoSlicer();
+        try {
+            return videoSlicer.slice(video, start, duration);
+        } catch (IOException e) {
+            throw new NuxeoException("Error while slicing the video. " + e.getMessage());
+        } catch (CommandNotAvailable commandNotAvailable) {
+            throw new NuxeoException(String.format("Command %s not available", commandNotAvailable.getMessage()));
+        }
     }
 
     @Override
-    public Blob sliceEqualParts(Blob video, long duration) {
-        return null;
+    public Blob sliceInEqualParts(Blob video, String duration) {
+        return slice(video, null, duration);
     }
 
     @Override

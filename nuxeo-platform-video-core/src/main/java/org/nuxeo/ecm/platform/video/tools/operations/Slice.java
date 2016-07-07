@@ -63,12 +63,12 @@ public class Slice {
 
     @OperationMethod(collector = BlobCollector.class)
     public Blob run(Blob input) throws NuxeoException {
-        VideoSlicer videoSlicer = new VideoSlicer(input);
+        VideoSlicer videoSlicer = new VideoSlicer();
         if (commandLine != null && !commandLine.isEmpty()) {
             videoSlicer.setCommandLineName(commandLine);
         }
         try {
-            return videoSlicer.slice(start, duration);
+            return videoSlicer.slice(input, start, duration);
         } catch (IOException | CommandNotAvailable e) {
             throw new NuxeoException(e);
         }

@@ -13,7 +13,8 @@
  *
  * Contributors:
  *     Thibaud Arguillere
- */
+ *//*
+
 
 package org.nuxeo.ecm.platform.video.tools;
 
@@ -21,9 +22,6 @@ import java.io.File;
 
 import org.nuxeo.ecm.core.api.Blob;
 
-/**
- * @since 8.4
- */
 public abstract class BaseVideoTools {
 
     protected Blob blob;
@@ -50,4 +48,4 @@ public abstract class BaseVideoTools {
         return VIDEOTOOLS_TEMP_DIR_PATH;
     }
 
-}
+}*/

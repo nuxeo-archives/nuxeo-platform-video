@@ -35,7 +35,7 @@ import org.nuxeo.ecm.platform.video.VideoHelper;
 import org.nuxeo.ecm.platform.video.VideoInfo;
 import org.nuxeo.runtime.api.Framework;
 
-public class VideoSlicer extends BaseVideoTools {
+public class VideoSlicer {
 
     public static final String COMMAND_SLICER_DEFAULT = "videoSlicer";
 
@@ -47,41 +47,34 @@ public class VideoSlicer extends BaseVideoTools {
 
     protected String commandLineName = COMMAND_SLICER_DEFAULT;
 
-    public VideoSlicer(Blob inBlob) {
-        super(inBlob);
-    }
-
     /**
-     * Slices the video at inStart for inDuration and returns a new blob
-     * 
-     * @param inStart
-     * @param inDuration
+     * Slices the video at start for duration and returns a new blob
+     *
+     * @param input
+     * @param start
+     * @param duration
      * @return Blob, slice of the original
      * @throws IOException
      * @throws CommandNotAvailable
      * @since 7.1
      */
-    public Blob slice(String inStart, String inDuration) throws IOException, CommandNotAvailable {
+    public Blob slice(Blob input, String start, String duration) throws IOException, CommandNotAvailable {
 
         Blob sliced = null;
 
-        if (blob == null) {
-            return null;
-        }
-
         // Get the final name, adding start/duration to the original name
-        String finalFileName = VideoToolsUtilities.addSuffixToFileName(blob.getFilename(),
-                "-" + inStart.replaceAll(":", "") + "-" + inDuration.replaceAll(":", ""));
+        String finalFileName = VideoToolsUtilities.addSuffixToFileName(input.getFilename(),
+                "-" + start.replaceAll(":", "") + "-" + duration.replaceAll(":", ""));
 
         CloseableFile sourceBlobFile = null;
         try {
-            sourceBlobFile = blob.getCloseableFile();
+            sourceBlobFile = input.getCloseableFile();
 
             CmdParameters params = new CmdParameters();
             params.addNamedParameter("sourceFilePath", sourceBlobFile.getFile().getAbsolutePath());
 
-            params.addNamedParameter("start", inStart);
-            params.addNamedParameter("duration", inDuration);
+            params.addNamedParameter("start", start);
+            params.addNamedParameter("duration", duration);
 
             String ext = FileUtils.getFileExtension(finalFileName);
             sliced = Blobs.createBlobWithExtension("." + ext);
@@ -103,7 +96,7 @@ public class VideoSlicer extends BaseVideoTools {
 
             // Build the Blob
             sliced.setFilename(finalFileName);
-            sliced.setMimeType(blob.getMimeType());
+            sliced.setMimeType(input.getMimeType());
 
         } finally {
             if (sourceBlobFile != null) {
@@ -116,38 +109,39 @@ public class VideoSlicer extends BaseVideoTools {
 
     /**
      * Slices the video in n segments of inDuration each (with possible approximations)
-     * 
-     * @param inDuration
+     *
+     * @param input
+     * @param duration
      * @return 1-n blobs of same duration (with the last one adjusted)
      * @throws IOException
      * @throws CommandNotAvailable
      * @since 7.1
      */
-    public BlobList slice(String inDuration) throws IOException, CommandNotAvailable {
+    public BlobList slice(Blob input, String duration) throws IOException, CommandNotAvailable {
 
         BlobList parts = new BlobList();
 
-        VideoInfo vi = VideoHelper.getVideoInfo(blob);
+        VideoInfo vi = VideoHelper.getVideoInfo(input);
 
-        if (Double.valueOf(inDuration) >= vi.getDuration()) {
-            parts.add(blob);
+        if (Double.valueOf(duration) >= vi.getDuration()) {
+            parts.add(input);
         } else {
-            String mimeType = blob.getMimeType();
+            String mimeType = input.getMimeType();
             CloseableFile sourceBlobFile = null;
             try {
-                sourceBlobFile = blob.getCloseableFile();
+                sourceBlobFile = input.getCloseableFile();
 
                 CmdParameters params = new CmdParameters();
 
                 params.addNamedParameter("sourceFilePath", sourceBlobFile.getFile().getAbsolutePath());
 
-                params.addNamedParameter("duration", inDuration);
+                params.addNamedParameter("duration", duration);
 
-                File folder = new File(getTempDirectoryPath() + "/" + "Segments-"
+                File folder = new File(VideoToolsUtilities.getTempDirectoryPath() + "/" + "Segments-"
                         + java.util.UUID.randomUUID().toString().replace("-", ""));
                 folder.mkdir();
                 String outFilePattern = folder.getAbsolutePath() + "/"
-                        + VideoToolsUtilities.addSuffixToFileName(blob.getFilename(), "-%03d");
+                        + VideoToolsUtilities.addSuffixToFileName(input.getFilename(), "-%03d");
                 params.addNamedParameter("outFilePath", outFilePattern);
 
                 CommandLineExecutorService cles = Framework.getService(CommandLineExecutorService.class);

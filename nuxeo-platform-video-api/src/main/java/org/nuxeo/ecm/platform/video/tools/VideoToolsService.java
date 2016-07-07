@@ -34,7 +34,7 @@ public interface VideoToolsService {
 
     Blob slice(Blob video, String start, String duration);
 
-    Blob sliceEqualParts(Blob video, long duration);
+    Blob sliceInEqualParts(Blob video, String duration);
 
     Blob watermark(Blob video, Blob picture, String x, String y);
 }
