@@ -35,13 +35,9 @@ import org.nuxeo.runtime.api.Framework;
 /**
  * @since 8.4
  */
-public class VideoWatermarker extends BaseVideoTools {
+public class VideoWatermarker {
 
     protected static final String COMMAND_WATERMARK_WITH_PICTURE = "videoWatermarkWithPicture";
-
-    public VideoWatermarker(Blob inBlob) {
-        super(inBlob);
-    }
 
     /* The command line is:
      * ffmpeg -y -i #{sourceFilePath} -i #{pictureFilePath} -filter_complex #{filterComplex} #{outFilePath}
@@ -49,24 +45,23 @@ public class VideoWatermarker extends BaseVideoTools {
      * filterComplex will be replaced with "overlay=10:10" (with 10:10 s an example)
      * 
      */
-    public Blob watermarkWithPicture(String inFinalFileName, Blob inWatermark, String x, String y) throws IOException,
+    public Blob watermark(Blob input, String outputFilename, Blob watermark, String x, String y) throws IOException,
             CommandNotAvailable, NuxeoException {
 
         Blob result = null;
-        String originalMimeType;
-        originalMimeType = blob.getMimeType();
+        String originalMimeType = input.getMimeType();
 
         // Prepare parameters
-        if (inFinalFileName == null || inFinalFileName.isEmpty()) {
-            inFinalFileName = VideoToolsUtilities.addSuffixToFileName(
-                    blob.getFilename(), "-WM");
+        if (outputFilename == null || outputFilename.isEmpty()) {
+            outputFilename = VideoToolsUtilities.addSuffixToFileName(
+                    input.getFilename(), "-WM");
         }
         String overlay = "overlay=" + x + ":" + y;
         
         CloseableFile sourceBlobFile = null, pictBlobFile = null;
         try {
-            sourceBlobFile = blob.getCloseableFile();
-            pictBlobFile = inWatermark.getCloseableFile();
+            sourceBlobFile = input.getCloseableFile();
+            pictBlobFile = watermark.getCloseableFile();
 
             // Prepare command line parameters
             CmdParameters params = new CmdParameters();
@@ -74,7 +69,7 @@ public class VideoWatermarker extends BaseVideoTools {
             params.addNamedParameter("pictureFilePath", pictBlobFile.getFile().getAbsolutePath());
             params.addNamedParameter("filterComplex", overlay);
             
-            String ext = FileUtils.getFileExtension(inFinalFileName);
+            String ext = FileUtils.getFileExtension(outputFilename);
             result = Blobs.createBlobWithExtension("." + ext);
             params.addNamedParameter("outFilePath", result.getFile().getAbsolutePath());
 
@@ -95,10 +90,8 @@ public class VideoWatermarker extends BaseVideoTools {
             }
             
             // Build the final blob
-            result.setFilename(inFinalFileName);
+            result.setFilename(outputFilename);
             result.setMimeType(originalMimeType);
-            
-            
         } finally {
             if (sourceBlobFile != null) {
                 sourceBlobFile.close();

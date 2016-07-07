@@ -22,9 +22,7 @@ import java.io.File;
 import org.nuxeo.ecm.core.api.Blob;
 
 /**
- * Umbrella class with basic utilities
- *
- * @since 7.1
+ * @since 8.4
  */
 public abstract class BaseVideoTools {
 

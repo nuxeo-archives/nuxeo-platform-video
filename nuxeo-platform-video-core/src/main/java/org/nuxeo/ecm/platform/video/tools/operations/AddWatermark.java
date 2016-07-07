@@ -67,8 +67,7 @@ public class AddWatermark {
 
     @OperationMethod(collector = BlobCollector.class)
     public Blob run(Blob input) throws NuxeoException, IOException, CommandNotAvailable {
-        VideoWatermarker watermarker = new VideoWatermarker(input);
         Blob watermark = (Blob) pictureDoc.getPropertyValue("file:content");
-        return watermarker.watermarkWithPicture(outputFilename, watermark, x, y);
+        return new VideoWatermarker().watermark(input, outputFilename, watermark, x, y);
     }
 }
