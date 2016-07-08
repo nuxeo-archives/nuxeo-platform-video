@@ -63,9 +63,8 @@ import static org.junit.Assert.assertTrue;
 @Deploy({ "org.nuxeo.ecm.automation.core", "org.nuxeo.ecm.platform.commandline.executor",
         "org.nuxeo.ecm.platform.video.convert" })
 @LocalDeploy({ "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-commandlines-contrib.xml",
-        "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-operations-contrib.xml",
         "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-service.xml" })
-public class TestVideoToolsService {
+public class TestVideoToolsService extends BaseVideoToolsTest {
 
     public static final String TEST_VIDEO = "DELTA.mp4";
 
@@ -156,21 +155,5 @@ public class TestVideoToolsService {
         Blob videoWithWatermark = service.watermark(video, watermark, "5", "5");
         assertNotNull(videoWithWatermark);
         assertTrue(videoWithWatermark.getLength() > 0);
-    }
-
-    protected Blob getTestVideo(String filename) throws IOException {
-        try (InputStream is = TestVideoService.class.getResourceAsStream("/" + filename)) {
-            assertNotNull("Failed to load resource: " + filename, is);
-            Blob blob = Blobs.createBlob(is, "video/mp4");
-            blob.setFilename(FilenameUtils.getName(filename));
-            return blob;
-        }
-    }
-
-    protected String fileBlobToString(FileBlob inBlob) throws IOException {
-        File f = inBlob.getFile();
-        Path p = Paths.get(f.getAbsolutePath());
-
-        return new String(Files.readAllBytes(p));
     }
 }

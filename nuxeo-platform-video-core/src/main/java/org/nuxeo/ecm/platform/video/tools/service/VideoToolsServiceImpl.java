@@ -11,7 +11,6 @@ import org.nuxeo.ecm.platform.video.tools.VideoConcatDemuxer;
 import org.nuxeo.ecm.platform.video.tools.VideoSlicer;
 import org.nuxeo.ecm.platform.video.tools.VideoToolsService;
 import org.nuxeo.ecm.platform.video.tools.VideoWatermarker;
-import org.nuxeo.ecm.platform.video.tools.operations.ExtractClosedCaptions;
 import org.nuxeo.runtime.model.ComponentContext;
 import org.nuxeo.runtime.model.ComponentInstance;
 import org.nuxeo.runtime.model.DefaultComponent;

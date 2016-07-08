@@ -70,8 +70,10 @@ public class Slice {
         }
         try {
             return videoSlicer.slice(input, start, duration);
-        } catch (IOException | CommandNotAvailable e) {
-            throw new OperationException(e);
+        } catch (IOException e) {
+            throw new OperationException("Cannot slice the video. " + e.getMessage());
+        } catch (CommandNotAvailable e) {
+            throw new OperationException("The command to slice the video is not available." + e.getMessage());
         }
     }
 
