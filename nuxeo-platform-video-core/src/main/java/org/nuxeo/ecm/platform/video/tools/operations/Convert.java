@@ -20,6 +20,7 @@
 package org.nuxeo.ecm.platform.video.tools.operations;
 
 import org.apache.commons.lang.StringUtils;
+import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
@@ -53,14 +54,14 @@ public class Convert {
     @Param(name = "xpath", required = false, values = { "file:content" })
     protected String xpath;
 
-    @OperationMethod(collector = DocumentModelCollector.class)
-    public Blob run(DocumentModel input) throws IOException, CommandNotAvailable {
+    @OperationMethod
+    public Blob run(DocumentModel input) throws OperationException {
         String blobPath = (!StringUtils.isEmpty(xpath))? xpath : "file:content";
         return run((Blob) input.getPropertyValue(blobPath));
     }
 
     @OperationMethod(collector = BlobCollector.class)
-    public Blob run(Blob inBlob) {
+    public Blob run(Blob inBlob) throws OperationException {
         VideoConverter videoConverter = new VideoConverter(inBlob);
         if (height > 0) {
             return videoConverter.convert(height, converter);

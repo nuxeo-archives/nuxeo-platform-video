@@ -22,6 +22,7 @@ package org.nuxeo.ecm.platform.video.tools.operations;
 import java.io.IOException;
 
 import org.apache.commons.lang.StringUtils;
+import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
@@ -59,15 +60,21 @@ public class AddWatermark {
     @Param(name = "xpath", required = false, values = { "file:content" })
     protected String xpath;
 
-    @OperationMethod(collector = DocumentModelCollector.class)
-    public Blob run(DocumentModel input) throws IOException, CommandNotAvailable {
+    @OperationMethod
+    public Blob run(DocumentModel input) throws OperationException {
         String blobPath = (!StringUtils.isEmpty(xpath))? xpath : "file:content";
         return run((Blob) input.getPropertyValue(blobPath));
     }
 
     @OperationMethod(collector = BlobCollector.class)
-    public Blob run(Blob input) throws NuxeoException, IOException, CommandNotAvailable {
+    public Blob run(Blob input) throws OperationException {
         Blob watermark = (Blob) pictureDoc.getPropertyValue("file:content");
-        return new VideoWatermarker().watermark(input, outputFilename, watermark, x, y);
+        try {
+            return new VideoWatermarker().watermark(input, outputFilename, watermark, x, y);
+        } catch (IOException e) {
+            throw new OperationException("Cannot add the watermark to the video. " + e.getMessage());
+        } catch (CommandNotAvailable e) {
+            throw new OperationException("The watermark command is not available. " + e.getMessage());
+        }
     }
 }

@@ -18,6 +18,7 @@
  */
 package org.nuxeo.ecm.platform.video.tools;
 
+import org.nuxeo.ecm.automation.core.util.BlobList;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -26,15 +27,65 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
  * @since 8.4
  */
 public interface VideoToolsService {
+
+    /**
+     * Extracts the closed captions from a video blob.
+     * @param video the input blob
+     * @param outputFormat the outformat of the captions (srt, txt, ttxt is the default)
+     * @param startAt the start time in format "xx:xx"
+     * @param endAt the end time in format "xx:xx"
+     * @return
+     */
     Blob extractClosedCaptions(Blob video, String outputFormat, String startAt, String endAt);
 
+    /**
+     * Concats the input video blobs into a single video blob.
+     * @param videos the input videos
+     * @return
+     */
     Blob concat(Blob ... videos);
 
+    /**
+     * Concats the input video blobs into a single video blob.
+     * @param videos
+     * @return
+     */
+    Blob concat(BlobList videos);
+
+    /**
+     * Convert a video blob.
+     * @param video
+     * @param height
+     * @param scale
+     * @param converter
+     * @return
+     */
     Blob convert(Blob video, long height, String scale, String converter);
 
-    Blob slice(Blob video, String start, String duration);
+    /**
+     * Slice a video blob from a start time and the input duration.
+     * @param video the input blob
+     * @param startAt the start time in "xx:xx" format
+     * @param duration the duration of the sliced blob in seconds
+     * @return
+     */
+    Blob slice(Blob video, String startAt, String duration);
 
-    Blob sliceInEqualParts(Blob video, String duration);
+    /**
+     * Slice a video blob in n-parts with similar duration.
+     * @param video the input blob
+     * @param duration the approximate duration of each part
+     * @return
+     */
+    BlobList slice(Blob video, String duration);
 
+    /**
+     * Add a watermark to a video blob.
+     * @param video the input blob
+     * @param picture the picture blob to be used as the watermark
+     * @param x the x offset starting from the left
+     * @param y the y offset starting from the top
+     * @return
+     */
     Blob watermark(Blob video, Blob picture, String x, String y);
 }

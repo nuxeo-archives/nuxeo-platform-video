@@ -22,6 +22,7 @@ package org.nuxeo.ecm.platform.video.tools.operations;
 import java.io.IOException;
 
 import org.apache.commons.lang.StringUtils;
+import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
@@ -55,14 +56,14 @@ public class Slice {
     @Param(name = "xpath", required = false, values = { "file:content" })
     protected String xpath;
 
-    @OperationMethod(collector = DocumentModelCollector.class)
-    public Blob run(DocumentModel input) throws IOException, CommandNotAvailable {
+    @OperationMethod
+    public Blob run(DocumentModel input) throws OperationException {
         String blobPath = (!StringUtils.isEmpty(xpath)) ? xpath : "file:content";
         return run((Blob) input.getPropertyValue(blobPath));
     }
 
     @OperationMethod(collector = BlobCollector.class)
-    public Blob run(Blob input) throws NuxeoException {
+    public Blob run(Blob input) throws OperationException {
         VideoSlicer videoSlicer = new VideoSlicer();
         if (commandLine != null && !commandLine.isEmpty()) {
             videoSlicer.setCommandLineName(commandLine);
@@ -70,7 +71,7 @@ public class Slice {
         try {
             return videoSlicer.slice(input, start, duration);
         } catch (IOException | CommandNotAvailable e) {
-            throw new NuxeoException(e);
+            throw new OperationException(e);
         }
     }
 

@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.lang.StringUtils;
+import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
@@ -57,27 +58,33 @@ public class ExtractClosedCaptions {
     @Param(name = "xpath", required = false, values = { "file:content" })
     protected String xpath;
 
-    @OperationMethod(collector = DocumentModelCollector.class)
-    public Blob run(DocumentModel input) throws IOException, CommandNotAvailable {
-        String blobPath = (!StringUtils.isEmpty(xpath))? xpath : "file:content";
+    @OperationMethod
+    public Blob run(DocumentModel input) throws OperationException {
+        String blobPath = (!StringUtils.isEmpty(xpath)) ? xpath : "file:content";
         return run((Blob) input.getPropertyValue(blobPath));
     }
 
     @OperationMethod(collector = BlobCollector.class)
-    public Blob run(Blob input) throws IOException, CommandNotAvailable {
-        CCExtractor cce = new CCExtractor(input, startAt, endAt);
-        Blob result = cce.extractCC(outFormat);
+    public Blob run(Blob input) throws OperationException {
+        try {
+            CCExtractor cce = new CCExtractor(input, startAt, endAt);
+            Blob result = cce.extractCC(outFormat);
 
-        if (result == null) {
-            File tempFile = Framework.createTempFile("NxVT-", "txt");
-            tempFile.deleteOnExit();
-            Framework.trackFile(tempFile, this);
-            result = new FileBlob(tempFile);
-            result.setMimeType("text/plain");
-            result.setFilename(input.getFilename() + "-noCC.txt");
+            if (result == null) {
+                File tempFile = Framework.createTempFile("NxVT-", "txt");
+                tempFile.deleteOnExit();
+                Framework.trackFile(tempFile, this);
+                result = new FileBlob(tempFile);
+                result.setMimeType("text/plain");
+                result.setFilename(input.getFilename() + "-noCC.txt");
+            }
+            return result;
+        } catch (IOException e) {
+            throw new OperationException("Cannot extract closed captions from blob. " + e.getMessage());
+        } catch (CommandNotAvailable e) {
+            throw new OperationException(
+                    "Cannot extract closed captions because the command is not available. " + e.getMessage());
         }
-
-        return result;
     }
 
 }

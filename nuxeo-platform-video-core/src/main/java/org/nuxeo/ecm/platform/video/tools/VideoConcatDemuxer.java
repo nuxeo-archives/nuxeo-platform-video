@@ -60,32 +60,14 @@ public class VideoConcatDemuxer {
 
     protected static final String COMMAND_CONCAT_VIDEOS_DEMUXER = "concatVideos-demuxer";
 
-    protected BlobList blobs = new BlobList();
-
-    public VideoConcatDemuxer() {
-
-    }
-
-    public void addBlob(Blob inBlob) {
-        if (inBlob != null) {
-            blobs.add(inBlob);
-        }
-    }
-
-    public void addBlobs(BlobList inBlobs) {
-        for (Blob b : inBlobs) {
-            addBlob(b);
-        }
-    }
-
-    public Blob concat() throws IOException, CommandNotAvailable, NuxeoException {
-        return concat(null);
+    public Blob concat(BlobList blobs) throws IOException, CommandNotAvailable, NuxeoException {
+        return concat(blobs, null);
     }
 
     /*
      * The command line is: ffmpeg -f concat -i #{listFilePath} -c copy #{outFilePath}
      */
-    public Blob concat(String inFinalFileName) throws IOException, CommandNotAvailable, NuxeoException {
+    public Blob concat(BlobList blobs, String outputFilename) throws IOException, CommandNotAvailable, NuxeoException {
 
         Blob result = null;
         String originalMimeType;
@@ -94,8 +76,8 @@ public class VideoConcatDemuxer {
             return null;
         }
 
-        if (inFinalFileName == null || inFinalFileName.isEmpty()) {
-            inFinalFileName = VideoToolsUtilities.addSuffixToFileName(blobs.get(0).getFilename(), "-concat");
+        if (outputFilename == null || outputFilename.isEmpty()) {
+            outputFilename = VideoToolsUtilities.addSuffixToFileName(blobs.get(0).getFilename(), "-concat");
         }
 
         originalMimeType = blobs.get(0).getMimeType();
@@ -113,10 +95,10 @@ public class VideoConcatDemuxer {
 
             }
 
-            tempFile = File.createTempFile("NxVTcv-", ".txt");
+            tempFile = Framework.createTempFile("NxVTcv-", ".txt");
             Files.write(tempFile.toPath(), list.getBytes());
 
-            String ext = FileUtils.getFileExtension(inFinalFileName);
+            String ext = FileUtils.getFileExtension(outputFilename);
             result = Blobs.createBlobWithExtension("." + ext);
             String outputFilePath = result.getFile().getAbsolutePath();
 
@@ -141,7 +123,7 @@ public class VideoConcatDemuxer {
             }
 
             // Update the Blob
-            result.setFilename(inFinalFileName);
+            result.setFilename(outputFilename);
             result.setMimeType(originalMimeType);
 
         } finally {

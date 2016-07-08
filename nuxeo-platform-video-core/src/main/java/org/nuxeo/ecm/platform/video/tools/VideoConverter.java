@@ -56,7 +56,7 @@ import org.nuxeo.runtime.api.Framework;
  *
  * @since 7.1
  */
-public class VideoConverter extends BaseVideoTools {
+public class VideoConverter /*extends BaseVideoTools */{
 
     private static final Log log = LogFactory.getLog(VideoConverter.class);
 
@@ -66,10 +66,12 @@ public class VideoConverter extends BaseVideoTools {
 
     String converter = "";
 
-    VideoInfo videoInfo = null;
+    protected Blob blob;
 
-    public VideoConverter(Blob inBlob) {
-        super(inBlob);
+    protected VideoInfo videoInfo;
+
+    public VideoConverter(Blob blob) {
+        this.blob = blob;
     }
 
     protected void loadVideoInfoIfNeeded() {
@@ -142,8 +144,7 @@ public class VideoConverter extends BaseVideoTools {
      * Use the <code>inConverter</code> converter to transcode the video. If
      * <code>inScale</code> is <= 0.0, the converted video will have the same
      * height as the original.
-     * 
-     * @param inHeight
+     *
      * @param inConverter
      * @return
      *

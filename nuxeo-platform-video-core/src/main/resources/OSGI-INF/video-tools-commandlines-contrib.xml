@@ -23,7 +23,7 @@
 		<!-- Using ffmpeg demuxer (https://trac.ffmpeg.org/wiki/Concatenate) -->
 		<command name="concatVideos-demuxer" enabled="true">
 			<commandLine>ffmpeg</commandLine>
-			<parameterString>-y -f concat -i #{listFilePath} -c copy #{outFilePath}</parameterString>
+			<parameterString>-y -f concat -safe 0 -i #{listFilePath} -c copy #{outFilePath}</parameterString>
 			<installationDirective>You need to install ffmpeg.</installationDirective>
 		</command>
 
@@ -45,7 +45,7 @@
 		     (OUT%03d.mp4 for example) so ffmpeg creates one file/segment -->
 		<command name="videoSlicerSegments" enabled="true">
 			<commandLine>ffmpeg</commandLine>
-			<parameterString>-y -i #{sourceFilePath}  -c copy -f segment -strftime 1 -segment_time #{duration} -reset_timestamps 1 #{outFilePath}</parameterString>
+			<parameterString>-y -i #{sourceFilePath} -map 0 -c copy -f segment -segment_time #{duration} -reset_timestamps 1 #{outFilePath}</parameterString>
 			<installationDirective>You need to install ffmpeg.</installationDirective>
 		</command>
 
