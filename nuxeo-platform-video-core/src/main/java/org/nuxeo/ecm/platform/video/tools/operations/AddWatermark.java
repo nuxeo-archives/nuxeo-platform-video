@@ -81,7 +81,7 @@ public class AddWatermark {
     public Blob run(Blob input) throws OperationException {
         Blob watermarkBlob = (Blob) watermark.getPropertyValue("file:content");
         try {
-            return new FFMpegVideoWatermarker().watermark(input, outputFilename, watermarkBlob, x, y);
+            return new FFMpegVideoWatermarker().watermark(input, watermarkBlob, x, y, outputFilename);
         } catch (NuxeoException e) {
             throw new OperationException("Cannot add the watermark to the video. " + e.getMessage());
         }

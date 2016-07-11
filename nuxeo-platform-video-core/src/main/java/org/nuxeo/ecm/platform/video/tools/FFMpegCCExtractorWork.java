@@ -51,11 +51,11 @@ import org.nuxeo.runtime.api.Framework;
  *
  * @since 8.4
  */
-public class CCExtractorWork extends AbstractWork {
+public class FFMpegCCExtractorWork extends AbstractWork {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Log log = LogFactory.getLog(CCExtractorWork.class);
+    private static final Log log = LogFactory.getLog(FFMpegCCExtractorWork.class);
 
     public static final String CATEGORY_VIDEO_CLOSED_CAPTIONS_EXTRACTOR = "videoClosedCaptionsExtractor";
 
@@ -65,7 +65,7 @@ public class CCExtractorWork extends AbstractWork {
         return repositoryName + ':' + docId + ":closedCaptionsExtraction:";
     }
 
-    public CCExtractorWork(String repositoryName, String docId) {
+    public FFMpegCCExtractorWork(String repositoryName, String docId) {
         super(computeIdPrefix(repositoryName, docId));
         setDocument(repositoryName, docId);
     }
@@ -105,7 +105,7 @@ public class CCExtractorWork extends AbstractWork {
         if (originalVideo != null) {
             FFMpegCCExtractor cce = new FFMpegCCExtractor();
             try {
-                result = cce.extract("ttxt", originalVideo.getBlob(), "", "");
+                result = cce.extract(originalVideo.getBlob(), "", "", "ttxt");
             } catch (Exception e) {
                 log.error("Cannot extract the closed captions", e);
                 result = null;

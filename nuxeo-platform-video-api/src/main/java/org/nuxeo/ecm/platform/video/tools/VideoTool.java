@@ -22,5 +22,4 @@ package org.nuxeo.ecm.platform.video.tools;
  * Common interface just to organize the Video Tools.
  * @since 8.4
  */
-public interface VideoTool {
-}
+public interface VideoTool {}

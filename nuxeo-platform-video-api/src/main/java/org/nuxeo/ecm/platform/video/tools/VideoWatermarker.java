@@ -26,5 +26,15 @@ import org.nuxeo.ecm.core.api.NuxeoException;
  */
 public interface VideoWatermarker extends VideoTool {
 
-    Blob watermark(Blob input, String outputFilename, Blob watermark, String x, String y) throws NuxeoException;
+    /**
+     * Adds a watermark picture to a video blob.
+     * @param blob the video blob
+     * @param watermark the watermark picture
+     * @param x the x position of the watermark, starting from the left
+     * @param y the y position of the watermark picture, starting from the top
+     * @param outputFilename the filename of the watermarked video
+     * @return
+     * @throws NuxeoException
+     */
+    Blob watermark(Blob blob,Blob watermark, String x, String y, String outputFilename) throws NuxeoException;
 }

@@ -47,7 +47,7 @@ public class FFMpegVideoWatermarker implements VideoWatermarker {
      * filterComplex will be replaced with "overlay=10:10" (with 10:10 s an example)
      * 
      */
-    public Blob watermark(Blob input, String outputFilename, Blob watermark, String x, String y) throws NuxeoException {
+    public Blob watermark(Blob input, Blob watermark, String x, String y, String outputFilename) throws NuxeoException {
 
         Blob result = null;
         try {

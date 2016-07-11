@@ -11,7 +11,8 @@
 
   <documentation>
     The VideoToolsService provides extension points to register
-    named tools for performing different actions in videos.
+    named tools for performing different actions in videos, such
+    as slicing, watermarking, etc.
   </documentation>
 
   <extension-point name="videoTools">

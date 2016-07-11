@@ -67,7 +67,7 @@ public class ExtractClosedCaptions {
     @OperationMethod(collector = BlobCollector.class)
     public Blob run(Blob input) throws OperationException {
         try {
-            Blob result = new FFMpegCCExtractor().extract(outFormat, input, startAt, endAt);
+            Blob result = new FFMpegCCExtractor().extract(input, startAt, endAt, outFormat);
 
             if (result == null) {
                 File tempFile = Framework.createTempFile("NxVT-", "txt");

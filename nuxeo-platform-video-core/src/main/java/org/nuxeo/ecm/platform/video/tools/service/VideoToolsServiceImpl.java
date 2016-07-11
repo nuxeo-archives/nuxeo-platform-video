@@ -84,7 +84,7 @@ public class VideoToolsServiceImpl extends DefaultComponent implements VideoTool
         if (toolDescriptors.containsKey(CC_EXTRACTER_TOOL)) {
             VideoToolDescriptor desc = toolDescriptors.get(CC_EXTRACTER_TOOL);
             VideoClosedCaptionsExtractor ccExtratorTool = (VideoClosedCaptionsExtractor) desc.getVideoTool();
-            return ccExtratorTool.extract(outputFormat, video, startAt, endAt);
+            return ccExtratorTool.extract(video, startAt, endAt, outputFormat);
         }
         return null;
     }
@@ -94,7 +94,7 @@ public class VideoToolsServiceImpl extends DefaultComponent implements VideoTool
         if (toolDescriptors.containsKey(CONCAT_TOOL)) {
             VideoToolDescriptor desc = toolDescriptors.get(CONCAT_TOOL);
             VideoConcat videoConcat = (VideoConcat) desc.getVideoTool();
-            return videoConcat.concat(videos);
+            return videoConcat.concat(videos, null);
         }
         return null;
     }
@@ -119,7 +119,7 @@ public class VideoToolsServiceImpl extends DefaultComponent implements VideoTool
         if (toolDescriptors.containsKey(SLICER_TOOL)) {
             VideoToolDescriptor desc = toolDescriptors.get(SLICER_TOOL);
             VideoSlicer slicer = (VideoSlicer) desc.getVideoTool();
-            return slicer.slice(video, startAt, duration);
+            return slicer.slice(video, duration, startAt);
         }
         return null;
     }
@@ -139,7 +139,7 @@ public class VideoToolsServiceImpl extends DefaultComponent implements VideoTool
         if (toolDescriptors.containsKey(WATERMARK_TOOL)) {
             VideoToolDescriptor desc = toolDescriptors.get(WATERMARK_TOOL);
             VideoWatermarker watermarker = (VideoWatermarker) desc.getVideoTool();
-            return watermarker.watermark(video, null, picture, x, y);
+            return watermarker.watermark(video, picture, x, y, null);
         }
         return null;
     }

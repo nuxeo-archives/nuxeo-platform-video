@@ -27,7 +27,13 @@ import java.io.File;
  * @since 8.4
  */
 public class VideoToolsUtilities {
-    
+
+    protected Blob blob;
+
+    private static final File VIDEOTOOLS_TEMP_DIR = new File(System.getProperty("java.io.tmpdir") + "/NuxeoVideoTools");
+
+    private static String VIDEOTOOLS_TEMP_DIR_PATH;
+
     /**
      * Build a filename, inserting the suffix between the file extension.
      * <p>
@@ -53,12 +59,6 @@ public class VideoToolsUtilities {
         return filename.substring(0, dotIndex) + suffix
                 + filename.substring(dotIndex);
     }
-
-    protected Blob blob;
-
-    private static final File VIDEOTOOLS_TEMP_DIR = new File(System.getProperty("java.io.tmpdir") + "/NuxeoVideoTools");
-
-    private static String VIDEOTOOLS_TEMP_DIR_PATH;
 
     public static String getTempDirectoryPath() {
 

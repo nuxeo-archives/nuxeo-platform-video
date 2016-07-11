@@ -26,5 +26,14 @@ import org.nuxeo.ecm.core.api.NuxeoException;
  */
 public interface VideoClosedCaptionsExtractor extends VideoTool {
 
-    Blob extract(String outputFormat, Blob video, String startAt, String endAt) throws NuxeoException;
+    /**
+     * Extract Closed Captions from the input video blob.
+     * @param outputFormat the output format of the closed captions
+     * @param video the input video blob
+     * @param startAt the start time from which closed captions should be extract
+     * @param endAt the end time from which closed captions should be extract
+     * @return
+     * @throws NuxeoException
+     */
+    Blob extract(Blob video, String startAt, String endAt, String outputFormat) throws NuxeoException;
 }

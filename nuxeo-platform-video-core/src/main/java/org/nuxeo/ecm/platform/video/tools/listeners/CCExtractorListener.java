@@ -17,7 +17,7 @@
  *     Thibaud Arguillere
  *     Ricardo Dias
  */
-package org.nuxeo.ecm.platform.video.tools;
+package org.nuxeo.ecm.platform.video.tools.listeners;
 
 import static org.nuxeo.ecm.platform.video.VideoConstants.VIDEO_CHANGED_EVENT;
 
@@ -32,6 +32,8 @@ import org.nuxeo.ecm.core.event.PostCommitFilteringEventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.ecm.core.work.api.WorkManager;
 import org.nuxeo.ecm.core.work.api.WorkManager.Scheduling;
+import org.nuxeo.ecm.platform.video.tools.FFMpegCCExtractorWork;
+import org.nuxeo.ecm.platform.video.tools.FFMpegCCExtractor;
 import org.nuxeo.runtime.api.Framework;
 
 /**
@@ -70,7 +72,7 @@ public class CCExtractorListener implements PostCommitFilteringEventListener {
         DocumentEventContext docCtx = (DocumentEventContext) ctx;
         DocumentModel doc = docCtx.getSourceDocument();
 
-        CCExtractorWork work = new CCExtractorWork(doc.getRepositoryName(),
+        FFMpegCCExtractorWork work = new FFMpegCCExtractorWork(doc.getRepositoryName(),
                 doc.getId());
 
         WorkManager workManager = Framework.getLocalService(WorkManager.class);

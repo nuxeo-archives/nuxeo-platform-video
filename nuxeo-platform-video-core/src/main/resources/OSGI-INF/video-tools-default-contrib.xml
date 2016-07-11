@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
 <component name="org.nuxeo.ecm.platform.video.tools.defaultTools">
-  <extension target="org.nuxeo.ecm.platform.video.tools.VideoToolsService"
-             point="videoTools">
+  <extension target="org.nuxeo.ecm.platform.video.tools.VideoToolsService" point="videoTools">
     <videoTool name="watermarkTool" enabled="true" class="org.nuxeo.ecm.platform.video.tools.FFMpegVideoWatermarker"/>
     <videoTool name="sliceTool" enabled="true" class="org.nuxeo.ecm.platform.video.tools.FFMpegVideoSlicer"/>
-    <videoTool name="concatTool" enabled="true" class="org.nuxeo.ecm.platform.video.tools.FFMpegVideoConcat" />
-    <videoTool name="ccExtractorTool" enabled="true" class="org.nuxeo.ecm.platform.video.tools.FFMpegCCExtractor" />
+    <videoTool name="concatTool" enabled="true" class="org.nuxeo.ecm.platform.video.tools.FFMpegVideoConcat"/>
+    <videoTool name="ccExtractorTool" enabled="true" class="org.nuxeo.ecm.platform.video.tools.FFMpegCCExtractor"/>
   </extension>
 </component>

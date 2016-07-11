@@ -15,7 +15,7 @@
  *     Thibaud Arguillere
  */
 
-package org.nuxeo.ecm.platform.video.tools;
+package org.nuxeo.ecm.platform.video.tools.listeners;
 
 import static org.nuxeo.ecm.core.api.event.DocumentEventTypes.ABOUT_TO_CREATE;
 import static org.nuxeo.ecm.core.api.event.DocumentEventTypes.BEFORE_DOC_UPDATE;

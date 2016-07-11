@@ -60,10 +60,6 @@ public class FFMpegVideoConcat implements VideoConcat {
 
     protected static final String COMMAND_CONCAT_VIDEOS_DEMUXER = "concatVideos-demuxer";
 
-    public Blob concat(BlobList blobs) throws NuxeoException {
-        return concat(blobs, null);
-    }
-
     /*
      * The command line is: ffmpeg -f concat -i #{listFilePath} -c copy #{outFilePath}
      */

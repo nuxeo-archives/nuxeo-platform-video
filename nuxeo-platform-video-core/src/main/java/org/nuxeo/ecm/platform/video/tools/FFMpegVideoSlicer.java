@@ -51,13 +51,13 @@ public class FFMpegVideoSlicer implements VideoSlicer {
      * Slices the video at start for duration and returns a new blob
      *
      * @param input
-     * @param start
      * @param duration
+     * @param start
      * @return Blob, slice of the original
      * @throws NuxeoException
      * @since 8.4
      */
-    public Blob slice(Blob input, String start, String duration) throws NuxeoException {
+    public Blob slice(Blob input, String duration, String start) throws NuxeoException {
 
         Blob sliced = null;
 

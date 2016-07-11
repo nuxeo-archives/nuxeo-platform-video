@@ -78,14 +78,14 @@ public class FFMpegCCExtractor implements VideoClosedCaptionsExtractor {
     }
 
     public Blob extract(Blob blob, String startAt, String endAt) throws CommandNotAvailable, IOException {
-        return extract(null, blob, startAt, endAt);
+        return extract(blob, startAt, endAt, null);
     }
 
     protected boolean isTextOutFormat(String inFormat) {
         return TEXT_OUTFORMATS.contains(inFormat);
     }
 
-    public Blob extract(String outputFormat, Blob blob, String startAt, String endAt) throws NuxeoException {
+    public Blob extract(Blob blob, String startAt, String endAt, String outputFormat) throws NuxeoException {
 
         Blob blobCC = null;
 
