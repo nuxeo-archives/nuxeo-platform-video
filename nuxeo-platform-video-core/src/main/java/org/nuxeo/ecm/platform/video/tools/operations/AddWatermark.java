@@ -28,14 +28,13 @@ import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
 import org.nuxeo.ecm.automation.core.annotations.Param;
 import org.nuxeo.ecm.automation.core.collectors.BlobCollector;
-import org.nuxeo.ecm.automation.core.collectors.DocumentModelCollector;
 import org.nuxeo.ecm.automation.core.util.BlobList;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.platform.commandline.executor.api.CommandNotAvailable;
-import org.nuxeo.ecm.platform.video.tools.VideoWatermarker;
+import org.nuxeo.ecm.platform.video.tools.FFMpegVideoWatermarker;
 
 /**
  * Watermark a Video with the given Picture, at the given position (from top-left).
@@ -82,11 +81,9 @@ public class AddWatermark {
     public Blob run(Blob input) throws OperationException {
         Blob watermarkBlob = (Blob) watermark.getPropertyValue("file:content");
         try {
-            return new VideoWatermarker().watermark(input, outputFilename, watermarkBlob, x, y);
-        } catch (IOException e) {
+            return new FFMpegVideoWatermarker().watermark(input, outputFilename, watermarkBlob, x, y);
+        } catch (NuxeoException e) {
             throw new OperationException("Cannot add the watermark to the video. " + e.getMessage());
-        } catch (CommandNotAvailable e) {
-            throw new OperationException("The watermark command is not available. " + e.getMessage());
         }
     }
 }

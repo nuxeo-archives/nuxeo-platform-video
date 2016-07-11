@@ -9,4 +9,16 @@
       interface="org.nuxeo.ecm.platform.video.tools.VideoToolsService" />
   </service>
 
+  <documentation>
+    The VideoToolsService provides extension points to register
+    named tools for performing different actions in videos.
+  </documentation>
+
+  <extension-point name="videoTools">
+    <documentation>
+      Extension point to contribute a video watermark tool.
+    </documentation>
+    <object class="org.nuxeo.ecm.platform.video.tools.VideoToolDescriptor" />
+  </extension-point>
+
 </component>

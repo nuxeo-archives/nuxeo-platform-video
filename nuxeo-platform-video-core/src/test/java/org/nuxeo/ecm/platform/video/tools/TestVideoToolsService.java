@@ -18,7 +18,6 @@
  */
 package org.nuxeo.ecm.platform.video.tools;
 
-import org.apache.commons.io.FilenameUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,10 +30,8 @@ import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
 import org.nuxeo.ecm.core.test.CoreFeature;
 import org.nuxeo.ecm.core.test.annotations.Granularity;
 import org.nuxeo.ecm.core.test.annotations.RepositoryConfig;
-import org.nuxeo.ecm.platform.test.PlatformFeature;
 import org.nuxeo.ecm.platform.video.VideoHelper;
 import org.nuxeo.ecm.platform.video.VideoInfo;
-import org.nuxeo.ecm.platform.video.service.TestVideoService;
 import org.nuxeo.runtime.test.runner.Deploy;
 import org.nuxeo.runtime.test.runner.Features;
 import org.nuxeo.runtime.test.runner.FeaturesRunner;
@@ -42,12 +39,7 @@ import org.nuxeo.runtime.test.runner.LocalDeploy;
 
 import javax.inject.Inject;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -61,14 +53,15 @@ import static org.junit.Assert.assertTrue;
 @Features(CoreFeature.class)
 @RepositoryConfig(cleanup = Granularity.METHOD)
 @Deploy({ "org.nuxeo.ecm.automation.core", "org.nuxeo.ecm.platform.commandline.executor",
-        "org.nuxeo.ecm.platform.video.convert" })
+      "org.nuxeo.ecm.platform.video.convert"})
 @LocalDeploy({ "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-commandlines-contrib.xml",
-        "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-service.xml" })
+        "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-service.xml",
+        "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-default-contrib.xml" })
 public class TestVideoToolsService extends BaseVideoToolsTest {
 
-    public static final String TEST_VIDEO = "DELTA.mp4";
+    public static final String TEST_VIDEO = "test-data/ccdemo.mov";
 
-    public static final String TEST_VIDEO_WITH_CC = "test-data/VideoLan-Example.ts";
+    public static final String TEST_VIDEO_SMALL = "DELTA.mp4";
 
     @Inject
     protected CoreSession session;
@@ -83,7 +76,7 @@ public class TestVideoToolsService extends BaseVideoToolsTest {
 
     @Test
     public void testExtractClosedCaptions() throws IOException {
-        Blob videowithCC = getTestVideo(TEST_VIDEO_WITH_CC);
+        Blob videowithCC = getTestVideo(TEST_VIDEO);
 
         Blob closedCaptions = service.extractClosedCaptions(videowithCC, "ttxt", "", "");
         assertNotNull(closedCaptions);
@@ -96,7 +89,7 @@ public class TestVideoToolsService extends BaseVideoToolsTest {
 
     @Test
     public void testExtractClosedCaptionsFromSlice() throws IOException {
-        Blob videowithCC = getTestVideo(TEST_VIDEO_WITH_CC);
+        Blob videowithCC = getTestVideo(TEST_VIDEO);
 
         Blob closedCaptions = service.extractClosedCaptions(videowithCC, "ttxt", "00:10", "00:20");
         assertNotNull(closedCaptions);
@@ -109,8 +102,8 @@ public class TestVideoToolsService extends BaseVideoToolsTest {
 
     @Test
     public void testConcat() throws IOException {
-        Blob oneVideo = getTestVideo(TEST_VIDEO);
-        Blob otherVideo = getTestVideo(TEST_VIDEO);
+        Blob oneVideo = getTestVideo(TEST_VIDEO_SMALL);
+        Blob otherVideo = getTestVideo(TEST_VIDEO_SMALL);
 
         Blob concatVideo = service.concat(oneVideo, otherVideo);
         assertNotNull(concatVideo);
@@ -123,7 +116,7 @@ public class TestVideoToolsService extends BaseVideoToolsTest {
     @Test
     public void testSlice() throws IOException {
         Blob video = getTestVideo(TEST_VIDEO);
-        Blob slicedVideo = service.slice(video, "00:00", "00:04");
+        Blob slicedVideo = service.slice(video, "00:02", "00:04");
 
         assertNotNull(slicedVideo);
         assertTrue(slicedVideo.getLength() > 0);
@@ -136,20 +129,20 @@ public class TestVideoToolsService extends BaseVideoToolsTest {
     public void testSliceEqualParts() throws IOException {
         Blob video = getTestVideo(TEST_VIDEO);
         // split in ~2s clips
-        BlobList slicedVideos = service.slice(video, "3");
+        BlobList slicedVideos = service.slice(video, "30");
 
         assertNotNull(slicedVideos);
-        assertTrue(slicedVideos.size() == 3);
+        assertTrue(slicedVideos.size() == 4);
 
         for (Blob blob : slicedVideos) {
             VideoInfo videoInfo = VideoHelper.getVideoInfo(blob);
-            assertEquals(videoInfo.getDuration(), 3.0, 1.0);
+            assertEquals(videoInfo.getDuration(), 25.0, 12.0);
         }
     }
 
     @Test
     public void testAddWatermark() throws IOException {
-        Blob video = getTestVideo(TEST_VIDEO);
+        Blob video = getTestVideo(TEST_VIDEO_SMALL);
         Blob watermark = Blobs.createBlob(FileUtils.getResourceFileFromContext("test-data/logo.jpeg"));
 
         Blob videoWithWatermark = service.watermark(video, watermark, "5", "5");

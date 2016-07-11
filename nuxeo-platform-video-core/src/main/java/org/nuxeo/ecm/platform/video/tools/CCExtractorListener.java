@@ -58,7 +58,7 @@ public class CCExtractorListener implements PostCommitFilteringEventListener {
 
     public void handleEvent(Event event) throws NuxeoException {
         
-        if(!CCExtractor.ccextractorIsAvailable()) {
+        if(!FFMpegCCExtractor.ccextractorIsAvailable()) {
             return;
         }
         

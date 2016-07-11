@@ -19,8 +19,6 @@
 package org.nuxeo.ecm.platform.video.tools;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.Blobs;
 import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
@@ -39,8 +37,6 @@ import static org.junit.Assert.assertNotNull;
  * @since 8.4
  */
 public abstract class BaseVideoToolsTest {
-
-    protected static final Log log = LogFactory.getLog(BaseVideoToolsTest.class);
 
     public static final String TEST_VIDEO = "DELTA.mp4";
 

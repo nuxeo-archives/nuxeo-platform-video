@@ -32,7 +32,7 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.platform.commandline.executor.api.CommandNotAvailable;
 
-import org.nuxeo.ecm.platform.video.tools.VideoConcatDemuxer;
+import org.nuxeo.ecm.platform.video.tools.FFMpegVideoConcat;
 
 /**
  * Merge 2-n videos in one using ffmpeg demuxer. Please, see to ffmpeg documentation about efficiency, timestamps, ...
@@ -53,7 +53,7 @@ public class Concat {
 
     @OperationMethod
     public Blob run(BlobList inBlobs) throws NuxeoException, IOException, CommandNotAvailable {
-        return new VideoConcatDemuxer().concat(inBlobs, resultFilename);
+        return new FFMpegVideoConcat().concat(inBlobs, resultFilename);
     }
 
     @OperationMethod

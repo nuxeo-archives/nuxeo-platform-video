@@ -20,10 +20,7 @@ package org.nuxeo.ecm.platform.video.tools;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +30,6 @@ import org.nuxeo.ecm.automation.AutomationService;
 import org.nuxeo.ecm.automation.OperationChain;
 import org.nuxeo.ecm.automation.OperationContext;
 import org.nuxeo.ecm.automation.OperationException;
-import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.util.BlobList;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.CoreSession;
@@ -116,7 +112,6 @@ public class TestVideoToolsOperations extends BaseVideoToolsTest {
 
         Blob watermarkedBlob = (Blob) service.run(ctx, chain);
         assertNotNull(watermarkedBlob);
-        // TODO - what else can I assert here
     }
 
     @Test

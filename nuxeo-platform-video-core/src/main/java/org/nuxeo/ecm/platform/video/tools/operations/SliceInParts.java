@@ -27,15 +27,12 @@ import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
 import org.nuxeo.ecm.automation.core.annotations.Param;
-import org.nuxeo.ecm.automation.core.collectors.BlobCollector;
-import org.nuxeo.ecm.automation.core.collectors.DocumentModelCollector;
 import org.nuxeo.ecm.automation.core.util.BlobList;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.platform.commandline.executor.api.CommandNotAvailable;
-import org.nuxeo.ecm.platform.video.tools.VideoSlicer;
+import org.nuxeo.ecm.platform.video.tools.FFMpegVideoSlicer;
 
 @Operation(id = SliceInParts.ID, category = Constants.CAT_CONVERSION, label = "Slice a Video in Parts with equal duration.", description = "Slices the video in n parts of <code>duration</code> each. USing ffmpeg -segment switch with few arguments: Each part will probably not be exactly <code>duration</code> long, this is normal behavior.", aliases = {
         "Video.SliceInParts" })
@@ -58,11 +55,9 @@ public class SliceInParts {
     @OperationMethod
     public BlobList run(Blob input) throws OperationException {
         try {
-            return new VideoSlicer().slice(input, duration);
-        } catch (IOException e) {
-            throw new OperationException("Cannot slice the video. " + e.getMessage());
-        } catch (CommandNotAvailable e) {
-            throw new OperationException("The command to slice the video is not available." + e.getMessage());
+            return new FFMpegVideoSlicer().slice(input, duration);
+        } catch(NuxeoException e){
+            throw new OperationException(e.getMessage());
         }
     }
 }

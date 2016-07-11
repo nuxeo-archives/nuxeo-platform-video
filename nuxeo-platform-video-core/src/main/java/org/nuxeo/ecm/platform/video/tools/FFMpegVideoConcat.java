@@ -56,18 +56,18 @@ import org.nuxeo.runtime.api.Framework;
  * 
  * @since 7.1
  */
-public class VideoConcatDemuxer {
+public class FFMpegVideoConcat implements VideoConcat {
 
     protected static final String COMMAND_CONCAT_VIDEOS_DEMUXER = "concatVideos-demuxer";
 
-    public Blob concat(BlobList blobs) throws IOException, CommandNotAvailable, NuxeoException {
+    public Blob concat(BlobList blobs) throws NuxeoException {
         return concat(blobs, null);
     }
 
     /*
      * The command line is: ffmpeg -f concat -i #{listFilePath} -c copy #{outFilePath}
      */
-    public Blob concat(BlobList blobs, String outputFilename) throws IOException, CommandNotAvailable, NuxeoException {
+    public Blob concat(BlobList blobs, String outputFilename) throws NuxeoException {
 
         Blob result = null;
         String originalMimeType;
@@ -82,60 +82,66 @@ public class VideoConcatDemuxer {
 
         originalMimeType = blobs.get(0).getMimeType();
 
-        ArrayList<CloseableFile> sourceClosableFiles = new ArrayList<CloseableFile>();
-        File tempFile = null;
         try {
+            ArrayList<CloseableFile> sourceClosableFiles = new ArrayList<CloseableFile>();
+            File tempFile = null;
+            try {
 
-            String list = "";
-            CloseableFile cf;
-            for (Blob b : blobs) {
-                cf = b.getCloseableFile();
-                sourceClosableFiles.add(cf);
-                list += "file '" + cf.getFile().getAbsolutePath() + "'\n";
+                String list = "";
+                CloseableFile cf;
+                for (Blob b : blobs) {
+                    cf = b.getCloseableFile();
+                    sourceClosableFiles.add(cf);
+                    list += "file '" + cf.getFile().getAbsolutePath() + "'\n";
 
-            }
+                }
 
-            tempFile = Framework.createTempFile("NxVTcv-", ".txt");
-            Files.write(tempFile.toPath(), list.getBytes());
+                tempFile = Framework.createTempFile("NxVTcv-", ".txt");
+                Files.write(tempFile.toPath(), list.getBytes());
 
-            String ext = FileUtils.getFileExtension(outputFilename);
-            result = Blobs.createBlobWithExtension("." + ext);
-            String outputFilePath = result.getFile().getAbsolutePath();
+                String ext = FileUtils.getFileExtension(outputFilename);
+                result = Blobs.createBlobWithExtension("." + ext);
+                String outputFilePath = result.getFile().getAbsolutePath();
 
-            // Run the command line
-            CmdParameters params = new CmdParameters();
-            params.addNamedParameter("listFilePath", tempFile.getAbsolutePath());
-            params.addNamedParameter("outFilePath", outputFilePath);
+                // Run the command line
+                CmdParameters params = new CmdParameters();
+                params.addNamedParameter("listFilePath", tempFile.getAbsolutePath());
+                params.addNamedParameter("outFilePath", outputFilePath);
 
-            CommandLineExecutorService cles = Framework.getService(CommandLineExecutorService.class);
-            ExecResult clResult = cles.execCommand(COMMAND_CONCAT_VIDEOS_DEMUXER, params);
+                CommandLineExecutorService cles = Framework.getService(CommandLineExecutorService.class);
+                ExecResult clResult = cles.execCommand(COMMAND_CONCAT_VIDEOS_DEMUXER, params);
 
-            // Get the result, and first, handle errors.
-            if (clResult.getError() != null) {
-                throw new NuxeoException("Failed to execute the command <" + COMMAND_CONCAT_VIDEOS_DEMUXER + ">",
-                        clResult.getError());
-            }
+                // Get the result, and first, handle errors.
+                if (clResult.getError() != null) {
+                    throw new NuxeoException("Failed to execute the command <" + COMMAND_CONCAT_VIDEOS_DEMUXER + ">",
+                            clResult.getError());
+                }
 
-            if (!clResult.isSuccessful()) {
-                throw new NuxeoException("Failed to execute the command <" + COMMAND_CONCAT_VIDEOS_DEMUXER
-                        + ">. Final command [ " + clResult.getCommandLine() + " ] returned with error "
-                        + clResult.getReturnCode());
-            }
+                if (!clResult.isSuccessful()) {
+                    throw new NuxeoException("Failed to execute the command <" + COMMAND_CONCAT_VIDEOS_DEMUXER
+                            + ">. Final command [ " + clResult.getCommandLine() + " ] returned with error "
+                            + clResult.getReturnCode());
+                }
 
-            // Update the Blob
-            result.setFilename(outputFilename);
-            result.setMimeType(originalMimeType);
+                // Update the Blob
+                result.setFilename(outputFilename);
+                result.setMimeType(originalMimeType);
 
-        } finally {
-            for (CloseableFile cf : sourceClosableFiles) {
-                if (cf != null) {
-                    cf.close();
+            } finally {
+                for (CloseableFile cf : sourceClosableFiles) {
+                    if (cf != null) {
+                        cf.close();
+                    }
+                }
+
+                if (tempFile != null && tempFile.exists()) {
+                    tempFile.delete();
                 }
             }
-
-            if (tempFile != null && tempFile.exists()) {
-                tempFile.delete();
-            }
+        } catch(IOException e){
+            throw new NuxeoException("Could not concat video blobs. " + e.getMessage());
+        } catch(CommandNotAvailable e){
+            throw new NuxeoException("Command to slice video blobs is not available. " + e.getMessage());
         }
 
         return result;

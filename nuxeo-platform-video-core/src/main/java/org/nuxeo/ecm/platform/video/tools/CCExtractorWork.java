@@ -46,7 +46,7 @@ import org.nuxeo.runtime.api.Framework;
  * <p>
  * As a worker, it runs asynchronously in a separated thread.
  * <p>
- * The work itself is quite basic: Just call <code>CCExtractor</code> and get
+ * The work itself is quite basic: Just call <code>FFMpegCCExtractor</code> and get
  * the result, if any.
  *
  * @since 8.4
@@ -83,7 +83,7 @@ public class CCExtractorWork extends AbstractWork {
     @Override
     public void work() {
         
-        if(!CCExtractor.ccextractorIsAvailable()) {
+        if(!FFMpegCCExtractor.ccextractorIsAvailable()) {
             setStatus("ccextractor command not available, no extraction done");
             log.warn("ccextractor command not available, no extraction done");
             return;
@@ -103,9 +103,9 @@ public class CCExtractorWork extends AbstractWork {
 
         Blob result = null;
         if (originalVideo != null) {
-            CCExtractor cce = new CCExtractor(originalVideo.getBlob());
+            FFMpegCCExtractor cce = new FFMpegCCExtractor();
             try {
-                result = cce.extractCC("ttxt");
+                result = cce.extract("ttxt", originalVideo.getBlob(), "", "");
             } catch (Exception e) {
                 log.error("Cannot extract the closed captions", e);
                 result = null;

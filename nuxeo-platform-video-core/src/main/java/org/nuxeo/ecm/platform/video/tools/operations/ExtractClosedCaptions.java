@@ -29,12 +29,12 @@ import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
 import org.nuxeo.ecm.automation.core.annotations.Param;
 import org.nuxeo.ecm.automation.core.collectors.BlobCollector;
-import org.nuxeo.ecm.automation.core.collectors.DocumentModelCollector;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
 import org.nuxeo.ecm.platform.commandline.executor.api.CommandNotAvailable;
-import org.nuxeo.ecm.platform.video.tools.CCExtractor;
+import org.nuxeo.ecm.platform.video.tools.FFMpegCCExtractor;
 import org.nuxeo.runtime.api.Framework;
 
 /**
@@ -67,8 +67,7 @@ public class ExtractClosedCaptions {
     @OperationMethod(collector = BlobCollector.class)
     public Blob run(Blob input) throws OperationException {
         try {
-            CCExtractor cce = new CCExtractor(input, startAt, endAt);
-            Blob result = cce.extractCC(outFormat);
+            Blob result = new FFMpegCCExtractor().extract(outFormat, input, startAt, endAt);
 
             if (result == null) {
                 File tempFile = Framework.createTempFile("NxVT-", "txt");
@@ -79,11 +78,10 @@ public class ExtractClosedCaptions {
                 result.setFilename(input.getFilename() + "-noCC.txt");
             }
             return result;
-        } catch (IOException e) {
+        } catch(IOException e) {
             throw new OperationException("Cannot extract closed captions from blob. " + e.getMessage());
-        } catch (CommandNotAvailable e) {
-            throw new OperationException(
-                    "Cannot extract closed captions because the command is not available. " + e.getMessage());
+        } catch(NuxeoException e) {
+            throw new OperationException(e.getMessage());
         }
     }
 
