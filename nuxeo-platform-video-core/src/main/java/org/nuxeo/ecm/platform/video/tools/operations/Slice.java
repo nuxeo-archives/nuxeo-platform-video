@@ -19,8 +19,6 @@
  */
 package org.nuxeo.ecm.platform.video.tools.operations;
 
-import java.io.IOException;
-
 import org.apache.commons.lang.StringUtils;
 import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.automation.core.Constants;
@@ -31,9 +29,8 @@ import org.nuxeo.ecm.automation.core.collectors.BlobCollector;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.NuxeoException;
-import org.nuxeo.ecm.platform.commandline.executor.api.CommandNotAvailable;
-import org.nuxeo.ecm.platform.video.tools.FFMpegVideoSlicer;
-import org.nuxeo.ecm.platform.video.tools.VideoSlicer;
+import org.nuxeo.ecm.platform.video.tools.VideoToolsService;
+import org.nuxeo.runtime.api.Framework;
 
 /**
  * @since 8.4
@@ -64,12 +61,12 @@ public class Slice {
 
     @OperationMethod(collector = BlobCollector.class)
     public Blob run(Blob input) throws OperationException {
-        VideoSlicer videoSlicer = new FFMpegVideoSlicer();
-        if (commandLine != null && !commandLine.isEmpty()) {
+        VideoToolsService videoService = Framework.getService(VideoToolsService.class);
+        /*if (commandLine != null && !commandLine.isEmpty()) {
             videoSlicer.setCommandLineName(commandLine);
-        }
+        }*/
         try {
-            return videoSlicer.slice(input, start, duration);
+            return videoService.slice(input, start, duration);
         } catch(NuxeoException e) {
             throw new OperationException(e.getMessage());
         }

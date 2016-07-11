@@ -32,9 +32,8 @@ public interface VideoWatermarker extends VideoTool {
      * @param watermark the watermark picture
      * @param x the x position of the watermark, starting from the left
      * @param y the y position of the watermark picture, starting from the top
-     * @param outputFilename the filename of the watermarked video
      * @return
      * @throws NuxeoException
      */
-    Blob watermark(Blob blob,Blob watermark, String x, String y, String outputFilename) throws NuxeoException;
+    Blob watermark(Blob blob, Blob watermark, String x, String y) throws NuxeoException;
 }

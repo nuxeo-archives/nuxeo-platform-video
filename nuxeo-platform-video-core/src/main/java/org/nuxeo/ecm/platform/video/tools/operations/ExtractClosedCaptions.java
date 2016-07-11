@@ -35,6 +35,7 @@ import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
 import org.nuxeo.ecm.platform.commandline.executor.api.CommandNotAvailable;
 import org.nuxeo.ecm.platform.video.tools.FFMpegCCExtractor;
+import org.nuxeo.ecm.platform.video.tools.VideoToolsService;
 import org.nuxeo.runtime.api.Framework;
 
 /**
@@ -67,8 +68,8 @@ public class ExtractClosedCaptions {
     @OperationMethod(collector = BlobCollector.class)
     public Blob run(Blob input) throws OperationException {
         try {
-            Blob result = new FFMpegCCExtractor().extract(input, startAt, endAt, outFormat);
-
+            VideoToolsService service = Framework.getService(VideoToolsService.class);
+            Blob result = service.extractClosedCaptions(input, outFormat, startAt, endAt);
             if (result == null) {
                 File tempFile = Framework.createTempFile("NxVT-", "txt");
                 tempFile.deleteOnExit();

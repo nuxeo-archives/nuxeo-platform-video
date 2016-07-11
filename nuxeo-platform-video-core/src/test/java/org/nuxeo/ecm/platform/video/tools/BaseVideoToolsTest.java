@@ -38,7 +38,9 @@ import static org.junit.Assert.assertNotNull;
  */
 public abstract class BaseVideoToolsTest {
 
-    public static final String TEST_VIDEO = "DELTA.mp4";
+    public static final String TEST_VIDEO_WITH_CC = "test-data/ccdemo.mov";
+
+    public static final String TEST_VIDEO_SMALL = "DELTA.mp4";
 
     protected Blob getTestVideo(String filename) throws IOException {
         try (InputStream is = TestVideoService.class.getResourceAsStream("/" + filename)) {

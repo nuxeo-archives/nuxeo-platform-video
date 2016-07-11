@@ -50,6 +50,7 @@ import org.nuxeo.runtime.test.runner.Features;
 import org.nuxeo.runtime.test.runner.FeaturesRunner;
 
 import com.google.inject.Inject;
+import org.nuxeo.runtime.test.runner.LocalDeploy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -62,13 +63,15 @@ import static org.junit.Assert.assertTrue;
 @RunWith(FeaturesRunner.class)
 @Features({ PlatformFeature.class })
 @Deploy({ "org.nuxeo.ecm.automation.core", "org.nuxeo.ecm.platform.commandline.executor",
-        "org.nuxeo.ecm.platform.video.core", "org.nuxeo.ecm.platform.video.convert",
-        "org.nuxeo.ecm.platform.picture.core" })
+        "org.nuxeo.ecm.platform.video.convert", "org.nuxeo.ecm.platform.picture.core" })
+@LocalDeploy({ "org.nuxeo.ecm.platform.video.core:OSGI-INF/core-types-contrib.xml",
+        "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-operations-contrib.xml",
+        "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-commandlines-contrib.xml",
+        "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-service.xml",
+        "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-default-contrib.xml" })
 public class TestVideoToolsOperations extends BaseVideoToolsTest {
 
     public static final String WATERMARK_PICTURE = "test-data/logo.jpeg";
-
-    public static final String TEST_VIDEO_WITH_CC = "test-data/VideoLan-Example.ts";
 
     protected DocumentModel folder;
 
@@ -94,7 +97,7 @@ public class TestVideoToolsOperations extends BaseVideoToolsTest {
 
     @Test
     public void testAddWatermarkTool() throws OperationException, IOException {
-        DocumentModel videoDoc = createVideoDocumentFromBlob(getTestVideo(TEST_VIDEO));
+        DocumentModel videoDoc = createVideoDocumentFromBlob(getTestVideo(TEST_VIDEO_SMALL));
         assertNotNull(videoDoc);
 
         DocumentModel watermarkDoc = createWatermarkDocument(FileUtils.getResourceFileFromContext(WATERMARK_PICTURE));
@@ -106,7 +109,6 @@ public class TestVideoToolsOperations extends BaseVideoToolsTest {
         chain.add(AddWatermark.ID)
              .set("watermark", watermarkDoc)
              .set("xpath", "file:content")
-             .set("outputFilename", "WatermarkedVideo.mp4") // TODO - Not working without a name
              .set("x", "5")
              .set("y", "5");
 
@@ -116,8 +118,8 @@ public class TestVideoToolsOperations extends BaseVideoToolsTest {
 
     @Test
     public void testConcatTool() throws IOException, OperationException {
-        DocumentModel doc1 = createVideoDocumentFromBlob(getTestVideo(TEST_VIDEO));
-        DocumentModel doc2 = createVideoDocumentFromBlob(getTestVideo(TEST_VIDEO));
+        DocumentModel doc1 = createVideoDocumentFromBlob(getTestVideo(TEST_VIDEO_SMALL));
+        DocumentModel doc2 = createVideoDocumentFromBlob(getTestVideo(TEST_VIDEO_SMALL));
 
         assertNotNull(doc1);
         assertNotNull(doc2);
@@ -140,7 +142,7 @@ public class TestVideoToolsOperations extends BaseVideoToolsTest {
 
     @Test
     public void testSliceTool() throws IOException, OperationException {
-        DocumentModel doc = createVideoDocumentFromBlob(getTestVideo(TEST_VIDEO));
+        DocumentModel doc = createVideoDocumentFromBlob(getTestVideo(TEST_VIDEO_SMALL));
 
         OperationContext ctx = new OperationContext(coreSession);
         ctx.setInput(doc);
@@ -158,19 +160,19 @@ public class TestVideoToolsOperations extends BaseVideoToolsTest {
 
     @Test
     public void testSliceInPartsTool() throws IOException, OperationException {
-        DocumentModel doc = createVideoDocumentFromBlob(getTestVideo(TEST_VIDEO));
+        DocumentModel doc = createVideoDocumentFromBlob(getTestVideo(TEST_VIDEO_WITH_CC));
 
         OperationContext ctx = new OperationContext(coreSession);
         ctx.setInput(doc);
         OperationChain chain = new OperationChain("testSliceInPartsTool");
-        chain.add(SliceInParts.ID).set("duration", "2");
+        chain.add(SliceInParts.ID).set("duration", "30");
 
         BlobList slices = (BlobList) service.run(ctx, chain);
         assertNotNull(slices);
 
         for (Blob blob : slices) {
             VideoInfo videoInfo = VideoHelper.getVideoInfo(blob);
-            assertEquals(videoInfo.getDuration(), 2.0, 1.0);
+            assertEquals(videoInfo.getDuration(), 25.0, 12.0);
         }
     }
 
@@ -190,7 +192,6 @@ public class TestVideoToolsOperations extends BaseVideoToolsTest {
         String cc = fileBlobToString((FileBlob) closedCaptions);
         assertNotNull(cc);
         assertNotEquals("", cc);
-        // TODO - closed captions are not being extracted, cannot do it through command line too!
     }
 
     @Test

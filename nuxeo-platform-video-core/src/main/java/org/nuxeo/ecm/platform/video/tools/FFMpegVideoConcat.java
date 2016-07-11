@@ -63,7 +63,7 @@ public class FFMpegVideoConcat implements VideoConcat {
     /*
      * The command line is: ffmpeg -f concat -i #{listFilePath} -c copy #{outFilePath}
      */
-    public Blob concat(BlobList blobs, String outputFilename) throws NuxeoException {
+    public Blob concat(BlobList blobs) throws NuxeoException {
 
         Blob result = null;
         String originalMimeType;
@@ -72,10 +72,7 @@ public class FFMpegVideoConcat implements VideoConcat {
             return null;
         }
 
-        if (outputFilename == null || outputFilename.isEmpty()) {
-            outputFilename = VideoToolsUtilities.addSuffixToFileName(blobs.get(0).getFilename(), "-concat");
-        }
-
+        String outputFilename = VideoToolsUtilities.addSuffixToFileName(blobs.get(0).getFilename(), "-concat");
         originalMimeType = blobs.get(0).getMimeType();
 
         try {

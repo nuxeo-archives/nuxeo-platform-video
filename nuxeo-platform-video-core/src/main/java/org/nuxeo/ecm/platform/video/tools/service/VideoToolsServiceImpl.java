@@ -94,7 +94,7 @@ public class VideoToolsServiceImpl extends DefaultComponent implements VideoTool
         if (toolDescriptors.containsKey(CONCAT_TOOL)) {
             VideoToolDescriptor desc = toolDescriptors.get(CONCAT_TOOL);
             VideoConcat videoConcat = (VideoConcat) desc.getVideoTool();
-            return videoConcat.concat(videos, null);
+            return videoConcat.concat(videos);
         }
         return null;
     }
@@ -139,7 +139,7 @@ public class VideoToolsServiceImpl extends DefaultComponent implements VideoTool
         if (toolDescriptors.containsKey(WATERMARK_TOOL)) {
             VideoToolDescriptor desc = toolDescriptors.get(WATERMARK_TOOL);
             VideoWatermarker watermarker = (VideoWatermarker) desc.getVideoTool();
-            return watermarker.watermark(video, picture, x, y, null);
+            return watermarker.watermark(video, picture, x, y);
         }
         return null;
     }

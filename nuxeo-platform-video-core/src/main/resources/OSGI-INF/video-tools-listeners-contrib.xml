@@ -1,5 +1,4 @@
-<component
-	name="org.nuxeo.ecm.platform.video.tools.listeners.VideoBeforeModificationListener">
+<component name="org.nuxeo.ecm.platform.video.tools.listeners.VideoBeforeModificationListener">
 
 	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent"
 		point="listener">

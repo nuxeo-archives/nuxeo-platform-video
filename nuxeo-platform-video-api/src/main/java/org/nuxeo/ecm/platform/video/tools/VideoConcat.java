@@ -30,9 +30,8 @@ public interface VideoConcat extends VideoTool {
     /**
      * Joins the a set of video blobs into a single one.
      * @param blobs the input video blobs
-     * @param outputFilename the filename of the output video blob
      * @return
      * @throws NuxeoException
      */
-    Blob concat(BlobList blobs, String outputFilename) throws NuxeoException;
+    Blob concat(BlobList blobs) throws NuxeoException;
 }

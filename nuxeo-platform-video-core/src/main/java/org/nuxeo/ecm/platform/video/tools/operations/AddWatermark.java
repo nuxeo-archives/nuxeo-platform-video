@@ -19,8 +19,6 @@
  */
 package org.nuxeo.ecm.platform.video.tools.operations;
 
-import java.io.IOException;
-
 import org.apache.commons.lang.StringUtils;
 import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.automation.core.Constants;
@@ -33,8 +31,8 @@ import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.NuxeoException;
-import org.nuxeo.ecm.platform.commandline.executor.api.CommandNotAvailable;
-import org.nuxeo.ecm.platform.video.tools.FFMpegVideoWatermarker;
+import org.nuxeo.ecm.platform.video.tools.VideoToolsService;
+import org.nuxeo.runtime.api.Framework;
 
 /**
  * Watermark a Video with the given Picture, at the given position (from top-left).
@@ -49,14 +47,11 @@ public class AddWatermark {
     @Param(name = "watermark", required = true)
     protected DocumentModel watermark;
 
-    @Param(name = "x", required = false)
-    protected String x = "0";
+    @Param(name = "x", required = false, values = { "0" })
+    protected String x;
 
-    @Param(name = "y", required = false)
-    protected String y = "0";
-
-    @Param(name = "outputFilename", required = false)
-    protected String outputFilename;
+    @Param(name = "y", required = false, values = { "0" })
+    protected String y;
 
     @Param(name = "xpath", required = false, values = { "file:content" })
     protected String xpath;
@@ -81,7 +76,8 @@ public class AddWatermark {
     public Blob run(Blob input) throws OperationException {
         Blob watermarkBlob = (Blob) watermark.getPropertyValue("file:content");
         try {
-            return new FFMpegVideoWatermarker().watermark(input, watermarkBlob, x, y, outputFilename);
+            VideoToolsService service = Framework.getService(VideoToolsService.class);
+            return service.watermark(input, watermarkBlob, x, y);
         } catch (NuxeoException e) {
             throw new OperationException("Cannot add the watermark to the video. " + e.getMessage());
         }

@@ -24,7 +24,6 @@ import java.io.IOException;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
-import org.nuxeo.ecm.automation.core.annotations.Param;
 import org.nuxeo.ecm.automation.core.util.BlobList;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -32,7 +31,8 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.platform.commandline.executor.api.CommandNotAvailable;
 
-import org.nuxeo.ecm.platform.video.tools.FFMpegVideoConcat;
+import org.nuxeo.ecm.platform.video.tools.VideoToolsService;
+import org.nuxeo.runtime.api.Framework;
 
 /**
  * Merge 2-n videos in one using ffmpeg demuxer. Please, see to ffmpeg documentation about efficiency, timestamps, ...
@@ -48,18 +48,16 @@ public class Concat {
 
     public static final String ID = "Video.Concat";
 
-    @Param(name = "resultFilename", required = false)
-    protected String resultFilename;
-
     @OperationMethod
-    public Blob run(BlobList inBlobs) throws NuxeoException, IOException, CommandNotAvailable {
-        return new FFMpegVideoConcat().concat(inBlobs, resultFilename);
+    public Blob run(BlobList blobs) throws NuxeoException, IOException, CommandNotAvailable {
+        VideoToolsService service = Framework.getService(VideoToolsService.class);
+        return service.concat(blobs);
     }
 
     @OperationMethod
-    public Blob run(DocumentModelList inDocs) throws NuxeoException, IOException, CommandNotAvailable {
+    public Blob run(DocumentModelList docs) throws NuxeoException, IOException, CommandNotAvailable {
         BlobList blobs = new BlobList();
-        for (DocumentModel doc : inDocs) {
+        for (DocumentModel doc : docs) {
             blobs.add((Blob) doc.getPropertyValue("file:content"));
         }
         return run(blobs);
