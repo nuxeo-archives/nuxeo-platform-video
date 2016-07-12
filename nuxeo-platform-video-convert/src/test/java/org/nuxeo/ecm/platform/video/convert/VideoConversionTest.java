@@ -31,28 +31,36 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assume;
-import org.junit.Before;
 import org.junit.Test;
 
+import org.junit.runner.RunWith;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.Blobs;
 import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
 import org.nuxeo.ecm.core.api.blobholder.SimpleBlobHolder;
 import org.nuxeo.ecm.core.convert.api.ConversionService;
+import org.nuxeo.ecm.core.test.CoreFeature;
 import org.nuxeo.ecm.platform.commandline.executor.api.CommandAvailability;
 import org.nuxeo.ecm.platform.commandline.executor.api.CommandLineExecutorService;
 import org.nuxeo.ecm.platform.video.VideoInfo;
 import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.test.NXRuntimeTestCase;
+import org.nuxeo.runtime.test.runner.Deploy;
+import org.nuxeo.runtime.test.runner.Features;
+import org.nuxeo.runtime.test.runner.FeaturesRunner;
 
 /**
  * @since 5.5
  */
-public class VideoConversionTest extends NXRuntimeTestCase {
+
+@RunWith(FeaturesRunner.class)
+@Features(CoreFeature.class)
+@Deploy({ "org.nuxeo.ecm.core.api", "org.nuxeo.ecm.core.convert.api", "org.nuxeo.ecm.core.convert", "org.nuxeo.ecm.platform.commandline.executor", "org.nuxeo.ecm.platform.convert", "org.nuxeo.ecm.platform.video.convert"})
+public class VideoConversionTest {
 
     public static final Log log = LogFactory.getLog(VideoConversionTest.class);
 
@@ -60,17 +68,8 @@ public class VideoConversionTest extends NXRuntimeTestCase {
 
     public static final String DELTA_OGV = "DELTA.ogv";
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        deployBundle("org.nuxeo.ecm.core.api");
-        deployBundle("org.nuxeo.ecm.core.convert.api");
-        deployBundle("org.nuxeo.ecm.core.convert");
-        deployBundle("org.nuxeo.ecm.platform.commandline.executor");
-        deployBundle("org.nuxeo.ecm.platform.convert");
-        deployBundle("org.nuxeo.ecm.platform.video.convert");
-    }
+    @Inject
+    protected ConversionService cs;
 
     protected static BlobHolder getBlobFromPath(String path, String mimeType) throws IOException {
         try (InputStream is = VideoConvertersTest.class.getResourceAsStream("/" + path)) {
@@ -83,7 +82,7 @@ public class VideoConversionTest extends NXRuntimeTestCase {
 
     protected BlobHolder applyConverter(String converter, String fileName, String mimeType, long newHeight)
             throws Exception {
-        ConversionService cs = Framework.getService(ConversionService.class);
+        cs = Framework.getService(ConversionService.class);
         assertNotNull(cs.getRegistredConverters().contains(converter));
         BlobHolder in = getBlobFromPath(fileName, mimeType);
         Map<String, Serializable> parameters = new HashMap<>();
@@ -152,12 +151,12 @@ public class VideoConversionTest extends NXRuntimeTestCase {
         CommandAvailability ca = cles.getCommandAvailability("ffmpeg-toavi");
         Assume.assumeTrue("ffmpeg-toavi is not available, skipping test", ca.isAvailable());
 
-        BlobHolder result = applyConverter(Constants.TO_MP4_CONVERTER, DELTA_OGV, "video/x-msvideo", 120);
+        BlobHolder result = applyConverter(Constants.TO_AVI_CONVERTER, DELTA_MP4, "video/x-msvideo", 120);
         List<Blob> blobs = result.getBlobs();
         assertFalse(blobs.isEmpty());
         assertEquals(1, blobs.size());
         Blob blob = blobs.get(0);
-        assertEquals("DELTA.mp4", blob.getFilename());
-        assertEquals("video/mp4", blob.getMimeType());
+        assertEquals("DELTA.avi", blob.getFilename());
+        assertEquals("video/x-msvideo", blob.getMimeType());
     }
 }
