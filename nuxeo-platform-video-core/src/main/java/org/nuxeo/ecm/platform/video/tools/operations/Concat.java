@@ -35,14 +35,11 @@ import org.nuxeo.ecm.platform.video.tools.VideoToolsService;
 import org.nuxeo.runtime.api.Framework;
 
 /**
- * Merge 2-n videos in one using ffmpeg demuxer. Please, see to ffmpeg documentation about efficiency, timestamps, ...
- * For example, mixing formats, sizes, frame rates ... will not create a nice final video. If
- * <code>resultFilename</code> is not used, the operation uses the first file and adds "-concat" (then the file
- * extension)
+ * Operation for merging 2-n videos in one.
  *
  * @since 8.4
  */
-@Operation(id = Concat.ID, category = Constants.CAT_CONVERSION, label = "Video concat using the ffmpeg demuxer.", description = "Merge 2-n videos in one using ffmpeg demuxer. Please, see to ffmpeg documentation about efficiency, timestamps, ... For example, mixing formats, sizes, frame rates ... will not create a nice final video. f <code>resultFilename</code> is not used, the operation uses the first file and adds -concat (then the file extension)", aliases = {
+@Operation(id = Concat.ID, category = Constants.CAT_CONVERSION, label = "Concat videos.", description = "Merge 2-n videos in one.", aliases = {
         "Video.Concat" })
 public class Concat {
 

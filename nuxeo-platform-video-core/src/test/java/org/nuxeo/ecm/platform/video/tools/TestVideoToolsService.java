@@ -128,7 +128,6 @@ public class TestVideoToolsService extends BaseVideoToolsTest {
     @Test
     public void testSliceEqualParts() throws IOException {
         Blob video = getTestVideo(TEST_VIDEO);
-        // split in ~2s clips
         BlobList slicedVideos = service.slice(video, "30");
 
         assertNotNull(slicedVideos);

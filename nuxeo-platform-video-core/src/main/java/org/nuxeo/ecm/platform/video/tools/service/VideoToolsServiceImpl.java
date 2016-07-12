@@ -36,6 +36,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Service for performing a set functions with videos.
+ * It provides extension points for a watermark tool, a slice tool, a concat tool and closed captions extractor tool.
+ *
  * @since 8.4
  */
 public class VideoToolsServiceImpl extends DefaultComponent implements VideoToolsService {
@@ -45,7 +48,7 @@ public class VideoToolsServiceImpl extends DefaultComponent implements VideoTool
     protected static final String WATERMARK_TOOL = "watermarkTool";
     protected static final String SLICER_TOOL = "sliceTool";
     protected static final String CONCAT_TOOL = "concatTool";
-    protected static final String CC_EXTRACTER_TOOL = "ccExtractorTool";
+    protected static final String CC_EXTRACTOR_TOOL = "ccExtractorTool";
 
     protected final Map<String, VideoToolDescriptor> toolDescriptors = new HashMap<>();
 
@@ -75,14 +78,10 @@ public class VideoToolsServiceImpl extends DefaultComponent implements VideoTool
         }
     }
 
-    /**
-     * Default implementation of the VideoToolsService.
-     **/
-
     @Override
     public Blob extractClosedCaptions(Blob video, String outputFormat, String startAt, String endAt) {
-        if (toolDescriptors.containsKey(CC_EXTRACTER_TOOL)) {
-            VideoToolDescriptor desc = toolDescriptors.get(CC_EXTRACTER_TOOL);
+        if (toolDescriptors.containsKey(CC_EXTRACTOR_TOOL)) {
+            VideoToolDescriptor desc = toolDescriptors.get(CC_EXTRACTOR_TOOL);
             VideoClosedCaptionsExtractor ccExtratorTool = (VideoClosedCaptionsExtractor) desc.getVideoTool();
             return ccExtratorTool.extract(video, startAt, endAt, outputFormat);
         }
@@ -106,12 +105,6 @@ public class VideoToolsServiceImpl extends DefaultComponent implements VideoTool
             blobs.add(videos[i]);
         }
         return concat(blobs);
-    }
-
-    @Override
-    public Blob convert(Blob video, long height, String scale, String converter) {
-        //TODO - what do do here with the convert?
-        return null;
     }
 
     @Override

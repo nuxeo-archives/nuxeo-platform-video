@@ -140,4 +140,11 @@ public class FFMpegVideoConcat implements VideoConcat {
         return result;
     }
 
+    public Blob concat(Blob... blobs) throws NuxeoException {
+        BlobList blobList = new BlobList();
+        for (int i = 0 ; i < blobs.length; i++) {
+            blobList.add(blobs[i]);
+        }
+        return concat(blobList);
+    }
 }

@@ -27,7 +27,6 @@ import org.nuxeo.ecm.core.api.NuxeoException;
  */
 public interface VideoSlicer extends VideoTool {
 
-
     /**
      * Slices a video blob in parts with approximately the same duration.
      * @param blob the video blob
@@ -40,12 +39,12 @@ public interface VideoSlicer extends VideoTool {
     /**
      * Slices a video blob with a certain duration and from a specified point in time.
      * @param blob the video blob
-     * @param start when to start slicing the video blob
+     * @param startAt when to start slicing the video blob
      * @param duration the duration of the slice
      * @return
      * @throws NuxeoException
      */
-    Blob slice(Blob blob, String start, String duration) throws NuxeoException;
+    Blob slice(Blob blob, String startAt, String duration) throws NuxeoException;
 
     //TODO - Don't know if I should maintain these methods as they break the transparency of the API
 

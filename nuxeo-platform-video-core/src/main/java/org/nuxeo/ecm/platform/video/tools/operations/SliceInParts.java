@@ -19,8 +19,6 @@
  */
 package org.nuxeo.ecm.platform.video.tools.operations;
 
-import java.io.IOException;
-
 import org.apache.commons.lang.StringUtils;
 import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.automation.core.Constants;
@@ -31,10 +29,15 @@ import org.nuxeo.ecm.automation.core.util.BlobList;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.NuxeoException;
-import org.nuxeo.ecm.platform.commandline.executor.api.CommandNotAvailable;
-import org.nuxeo.ecm.platform.video.tools.FFMpegVideoSlicer;
+import org.nuxeo.ecm.platform.video.tools.VideoToolsService;
+import org.nuxeo.runtime.api.Framework;
 
-@Operation(id = SliceInParts.ID, category = Constants.CAT_CONVERSION, label = "Slice a Video in Parts with equal duration.", description = "Slices the video in n parts of <code>duration</code> each. USing ffmpeg -segment switch with few arguments: Each part will probably not be exactly <code>duration</code> long, this is normal behavior.", aliases = {
+/**
+ * Operation for slicing a video in parts with approximately equal duration.
+ *
+ * @since 8.4
+ */
+@Operation(id = SliceInParts.ID, category = Constants.CAT_CONVERSION, label = "Slice a Video in Parts with equal duration.", description = "Slices the video in n parts of approximately the same duration each.", aliases = {
         "Video.SliceInParts" })
 public class SliceInParts {
 
@@ -55,7 +58,8 @@ public class SliceInParts {
     @OperationMethod
     public BlobList run(Blob input) throws OperationException {
         try {
-            return new FFMpegVideoSlicer().slice(input, duration);
+            VideoToolsService service = Framework.getService(VideoToolsService.class);
+            return service.slice(input, duration);
         } catch(NuxeoException e){
             throw new OperationException(e.getMessage());
         }

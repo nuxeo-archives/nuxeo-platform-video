@@ -19,8 +19,7 @@
  */
 package org.nuxeo.ecm.platform.video.tools;
 
-import org.nuxeo.ecm.core.api.Blob;
-
+import org.nuxeo.common.Environment;
 import java.io.File;
 
 /**
@@ -28,19 +27,14 @@ import java.io.File;
  */
 public class VideoToolsUtilities {
 
-    protected Blob blob;
-
-    private static final File VIDEOTOOLS_TEMP_DIR = new File(System.getProperty("java.io.tmpdir") + "/NuxeoVideoTools");
+    private static final File VIDEOTOOLS_TEMP_DIR = new File(Environment.getDefault().getProperty(Environment.NUXEO_TMP_DIR) + "/NuxeoVideoTools");
 
     private static String VIDEOTOOLS_TEMP_DIR_PATH;
 
     /**
      * Build a filename, inserting the suffix between the file extension.
-     * <p>
      * If the fileName has no extension, the suffix is just added.
-     * <p>
      * (if the suffix is null or empty, nothing happens)
-     * 
      * @param filename
      * @param suffix
      * @return
@@ -60,8 +54,11 @@ public class VideoToolsUtilities {
                 + filename.substring(dotIndex);
     }
 
+    /**
+     * Return the temporary directory path for the video tools.
+     * @return
+     */
     public static String getTempDirectoryPath() {
-
         if(VIDEOTOOLS_TEMP_DIR_PATH == null) {
             synchronized (VIDEOTOOLS_TEMP_DIR) {
                 if(VIDEOTOOLS_TEMP_DIR_PATH == null) {
@@ -70,7 +67,6 @@ public class VideoToolsUtilities {
                 }
             }
         }
-
         return VIDEOTOOLS_TEMP_DIR_PATH;
     }
 }

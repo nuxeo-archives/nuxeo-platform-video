@@ -28,10 +28,18 @@ import org.nuxeo.ecm.core.api.NuxeoException;
 public interface VideoConcat extends VideoTool {
 
     /**
-     * Joins the a set of video blobs into a single one.
+     * Concat the a set of video blobs into a single one.
      * @param blobs the input video blobs
      * @return
      * @throws NuxeoException
      */
     Blob concat(BlobList blobs) throws NuxeoException;
+
+    /**
+     * Concat the array of videos into a single one.
+     * @param blobs
+     * @return
+     * @throws NuxeoException
+     */
+    Blob concat(Blob... blobs) throws NuxeoException;
 }

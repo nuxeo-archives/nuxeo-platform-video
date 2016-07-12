@@ -48,23 +48,23 @@ public class FFMpegVideoSlicer implements VideoSlicer {
     protected String commandLineName = COMMAND_SLICER_DEFAULT;
 
     /**
-     * Slices the video at start for duration and returns a new blob
+     * Slices the video at startAt for duration and returns a new blob
      *
      * @param input
      * @param duration
-     * @param start
+     * @param startAt
      * @return Blob, slice of the original
      * @throws NuxeoException
      * @since 8.4
      */
-    public Blob slice(Blob input, String duration, String start) throws NuxeoException {
+    public Blob slice(Blob input, String duration, String startAt) throws NuxeoException {
 
         Blob sliced = null;
 
         try {
-            // Get the final name, adding start/duration to the original name
+            // Get the final name, adding startAt/duration to the original name
             String finalFileName = VideoToolsUtilities.addSuffixToFileName(input.getFilename(),
-                    "-" + start.replaceAll(":", "") + "-" + duration.replaceAll(":", ""));
+                    "-" + startAt.replaceAll(":", "") + "-" + duration.replaceAll(":", ""));
 
             CloseableFile sourceBlobFile = null;
             try {
@@ -73,7 +73,7 @@ public class FFMpegVideoSlicer implements VideoSlicer {
                 CmdParameters params = new CmdParameters();
                 params.addNamedParameter("sourceFilePath", sourceBlobFile.getFile().getAbsolutePath());
 
-                params.addNamedParameter("start", start);
+                params.addNamedParameter("start", startAt);
                 params.addNamedParameter("duration", duration);
 
                 String ext = FileUtils.getFileExtension(finalFileName);
@@ -137,9 +137,7 @@ public class FFMpegVideoSlicer implements VideoSlicer {
                     sourceBlobFile = input.getCloseableFile();
 
                     CmdParameters params = new CmdParameters();
-
                     params.addNamedParameter("sourceFilePath", sourceBlobFile.getFile().getAbsolutePath());
-
                     params.addNamedParameter("duration", duration);
 
                     File folder = new File(VideoToolsUtilities.getTempDirectoryPath() + "/" + "Segments-"

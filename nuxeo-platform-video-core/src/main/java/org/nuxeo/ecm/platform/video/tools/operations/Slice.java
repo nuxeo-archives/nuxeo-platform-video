@@ -26,23 +26,26 @@ import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
 import org.nuxeo.ecm.automation.core.annotations.Param;
 import org.nuxeo.ecm.automation.core.collectors.BlobCollector;
+import org.nuxeo.ecm.automation.core.util.BlobList;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.platform.video.tools.VideoToolsService;
 import org.nuxeo.runtime.api.Framework;
 
 /**
+ * Slices the video to obtain a part of it.
  * @since 8.4
  */
-@Operation(id = Slice.ID, category = Constants.CAT_CONVERSION, label = "Slice the Video for a given duration and start time.", description = "Slice the input blob starting at <code>start</code>, for <code>duration</code>. A specific converter can be used. For example, use videoSlicerByCopy for very fast cut (because ffmpeg does not re-encode the video) if you know there will be no frame or timestamp issue in the sliced video", aliases = {
+@Operation(id = Slice.ID, category = Constants.CAT_CONVERSION, label = "Slice the ivdeo for a given duration and startAt time.", description = "Slice the input blob starting at startAt, for a certain duration. A specific converter can be used.", aliases = {
         "Video.Slice" })
 public class Slice {
 
     public static final String ID = "Video.Slice";
 
-    @Param(name = "start", required = false)
-    protected String start;
+    @Param(name = "startAt", required = false)
+    protected String startAt;
 
     @Param(name = "duration", required = false)
     protected String duration;
@@ -59,6 +62,15 @@ public class Slice {
         return run((Blob) input.getPropertyValue(blobPath));
     }
 
+    @OperationMethod
+    public BlobList run(DocumentModelList input) throws OperationException {
+        BlobList blobList = new BlobList();
+        for (DocumentModel doc : input) {
+            blobList.add(run(doc));
+        }
+        return blobList;
+    }
+
     @OperationMethod(collector = BlobCollector.class)
     public Blob run(Blob input) throws OperationException {
         VideoToolsService videoService = Framework.getService(VideoToolsService.class);
@@ -66,7 +78,7 @@ public class Slice {
             videoSlicer.setCommandLineName(commandLine);
         }*/
         try {
-            return videoService.slice(input, start, duration);
+            return videoService.slice(input, startAt, duration);
         } catch(NuxeoException e) {
             throw new OperationException(e.getMessage());
         }

@@ -20,8 +20,6 @@ package org.nuxeo.ecm.platform.video.tools;
 
 import org.nuxeo.ecm.automation.core.util.BlobList;
 import org.nuxeo.ecm.core.api.Blob;
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
 
 /**
  * @since 8.4
@@ -39,28 +37,18 @@ public interface VideoToolsService {
     Blob extractClosedCaptions(Blob video, String outputFormat, String startAt, String endAt);
 
     /**
-     * Concats the input video blobs into a single video blob.
+     * Concat the input video blobs into a single video blob.
      * @param videos the input videos
      * @return
      */
     Blob concat(Blob ... videos);
 
     /**
-     * Concats the input video blobs into a single video blob.
+     * Concat the input video blobs into a single video blob.
      * @param videos
      * @return
      */
     Blob concat(BlobList videos);
-
-    /**
-     * Convert a video blob.
-     * @param video
-     * @param height
-     * @param scale
-     * @param converter
-     * @return
-     */
-    Blob convert(Blob video, long height, String scale, String converter);
 
     /**
      * Slice a video blob from a start time and the input duration.

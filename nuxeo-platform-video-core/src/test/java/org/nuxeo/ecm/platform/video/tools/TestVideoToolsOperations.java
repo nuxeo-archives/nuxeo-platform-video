@@ -147,7 +147,7 @@ public class TestVideoToolsOperations extends BaseVideoToolsTest {
         OperationContext ctx = new OperationContext(coreSession);
         ctx.setInput(doc);
         OperationChain chain = new OperationChain("testSliceTool");
-        chain.add(Slice.ID).set("start", "00:02").set("duration", "00:04");
+        chain.add(Slice.ID).set("startAt", "00:02").set("duration", "00:04");
 
         Blob sliceVideo = (Blob) service.run(ctx, chain);
 

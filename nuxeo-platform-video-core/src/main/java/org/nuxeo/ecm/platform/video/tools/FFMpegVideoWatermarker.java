@@ -31,22 +31,22 @@ import org.nuxeo.ecm.platform.commandline.executor.api.CommandLineExecutorServic
 import org.nuxeo.ecm.platform.commandline.executor.api.CommandNotAvailable;
 import org.nuxeo.ecm.platform.commandline.executor.api.ExecResult;
 import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.deployment.preprocessor.install.Command;
 
 /**
  * Default implementation of the VideoWatermarker.
+ *
  * @since 8.4
  */
 public class FFMpegVideoWatermarker implements VideoWatermarker {
 
-    protected static final String COMMAND_WATERMARK_WITH_PICTURE = "videoWatermarkWithPicture";
-
     /* The command line is:
      * ffmpeg -y -i #{sourceFilePath} -i #{pictureFilePath} -filter_complex #{filterComplex} #{outFilePath}
-     * 
+     *
      * filterComplex will be replaced with "overlay=10:10" (with 10:10 s an example)
-     * 
+     *
      */
+    protected static final String COMMAND_WATERMARK_WITH_PICTURE = "videoWatermarkWithPicture";
+
     public Blob watermark(Blob input, Blob watermark, String x, String y) throws NuxeoException {
 
         Blob result = null;

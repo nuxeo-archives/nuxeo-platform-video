@@ -29,19 +29,21 @@ import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
 import org.nuxeo.ecm.automation.core.annotations.Param;
 import org.nuxeo.ecm.automation.core.collectors.BlobCollector;
+import org.nuxeo.ecm.automation.core.util.BlobList;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
-import org.nuxeo.ecm.platform.commandline.executor.api.CommandNotAvailable;
-import org.nuxeo.ecm.platform.video.tools.FFMpegCCExtractor;
 import org.nuxeo.ecm.platform.video.tools.VideoToolsService;
 import org.nuxeo.runtime.api.Framework;
 
 /**
+ * Extracts Closed Captions from a Video.
+ * 
  * @since 8.4
  */
-@Operation(id = ExtractClosedCaptions.ID, category = Constants.CAT_CONVERSION, label = "Extracts Closed Captions from the Video.", description = "Returns a Blob containing the closed captions using <code>ccextractor</code> (see its documentation about <code>outFormat</code>). If <code>startAt</code>/<code>endAt</code> are empty, the whole movie is handled. If the input is a document, you can use <code>xpath</code> (ignored if the input is a blob)", aliases = {
+@Operation(id = ExtractClosedCaptions.ID, category = Constants.CAT_CONVERSION, label = "Extracts closed captions from the video.", description = "Extracts the closed captions from the whole video or from a part of it when startAt and end time is provided. The output format references how the output is generated, and xpath can be used to indicate the video blob when using documents.", aliases = {
         "Video.ExtractClosedCaptions" })
 public class ExtractClosedCaptions {
 
@@ -65,6 +67,15 @@ public class ExtractClosedCaptions {
         return run((Blob) input.getPropertyValue(blobPath));
     }
 
+    @OperationMethod
+    public BlobList run(DocumentModelList input) throws OperationException {
+        BlobList blobList = new BlobList();
+        for (DocumentModel doc : input) {
+            blobList.add((run(doc)));
+        }
+        return blobList;
+    }
+
     @OperationMethod(collector = BlobCollector.class)
     public Blob run(Blob input) throws OperationException {
         try {
@@ -79,9 +90,9 @@ public class ExtractClosedCaptions {
                 result.setFilename(input.getFilename() + "-noCC.txt");
             }
             return result;
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new OperationException("Cannot extract closed captions from blob. " + e.getMessage());
-        } catch(NuxeoException e) {
+        } catch (NuxeoException e) {
             throw new OperationException(e.getMessage());
         }
     }
