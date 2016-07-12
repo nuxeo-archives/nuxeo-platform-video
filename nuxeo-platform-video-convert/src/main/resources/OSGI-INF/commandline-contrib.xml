@@ -60,6 +60,13 @@
       </installationDirective>
     </command>
 
-  </extension>
+      <command name="ffmpeg-toavi" enabled="true">
+        <commandLine>ffmpeg</commandLine>
+        <parameterString> -i #{inFilePath} -s #{width}x#{height} -q:v 0 -c:v mpeg4 -c:a ac3 #{outFilePath}</parameterString>
+        <installationDirective>You need to install ffmpeg.
+        </installationDirective>
+      </command>
+
+    </extension>
 
 </component>

@@ -15,6 +15,7 @@
  *
  * Contributors:
  *     Thomas Roger <troger@nuxeo.com>
+ *     Ricardo Dias <rdias@nuxeo.com>
  */
 
 package org.nuxeo.ecm.platform.video.convert;
@@ -49,7 +50,6 @@ import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.test.NXRuntimeTestCase;
 
 /**
- * @author <a href="mailto:troger@nuxeo.com">Thomas Roger</a>
  * @since 5.5
  */
 public class VideoConversionTest extends NXRuntimeTestCase {
@@ -137,6 +137,22 @@ public class VideoConversionTest extends NXRuntimeTestCase {
         Assume.assumeTrue("ffmpeg-toogg is not available, skipping test", ca.isAvailable());
 
         BlobHolder result = applyConverter(Constants.TO_MP4_CONVERTER, DELTA_OGV, "video/ogg", 480);
+        List<Blob> blobs = result.getBlobs();
+        assertFalse(blobs.isEmpty());
+        assertEquals(1, blobs.size());
+        Blob blob = blobs.get(0);
+        assertEquals("DELTA.mp4", blob.getFilename());
+        assertEquals("video/mp4", blob.getMimeType());
+    }
+
+    @Test
+    public void testAVIConversion() throws Exception {
+        CommandLineExecutorService cles = Framework.getLocalService(CommandLineExecutorService.class);
+        assertNotNull(cles);
+        CommandAvailability ca = cles.getCommandAvailability("ffmpeg-toavi");
+        Assume.assumeTrue("ffmpeg-toavi is not available, skipping test", ca.isAvailable());
+
+        BlobHolder result = applyConverter(Constants.TO_MP4_CONVERTER, DELTA_OGV, "video/x-msvideo", 120);
         List<Blob> blobs = result.getBlobs();
         assertFalse(blobs.isEmpty());
         assertEquals(1, blobs.size());

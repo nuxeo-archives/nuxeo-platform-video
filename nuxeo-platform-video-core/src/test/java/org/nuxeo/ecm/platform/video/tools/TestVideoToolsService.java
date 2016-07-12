@@ -59,10 +59,6 @@ import static org.junit.Assert.assertTrue;
         "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-default-contrib.xml" })
 public class TestVideoToolsService extends BaseVideoToolsTest {
 
-    public static final String TEST_VIDEO = "test-data/ccdemo.mov";
-
-    public static final String TEST_VIDEO_SMALL = "DELTA.mp4";
-
     @Inject
     protected CoreSession session;
 
@@ -76,7 +72,7 @@ public class TestVideoToolsService extends BaseVideoToolsTest {
 
     @Test
     public void testExtractClosedCaptions() throws IOException {
-        Blob videowithCC = getTestVideo(TEST_VIDEO);
+        Blob videowithCC = getTestVideo(TEST_VIDEO_WITH_CC);
 
         Blob closedCaptions = service.extractClosedCaptions(videowithCC, "ttxt", "", "");
         assertNotNull(closedCaptions);
@@ -89,7 +85,7 @@ public class TestVideoToolsService extends BaseVideoToolsTest {
 
     @Test
     public void testExtractClosedCaptionsFromSlice() throws IOException {
-        Blob videowithCC = getTestVideo(TEST_VIDEO);
+        Blob videowithCC = getTestVideo(TEST_VIDEO_WITH_CC);
 
         Blob closedCaptions = service.extractClosedCaptions(videowithCC, "ttxt", "00:10", "00:20");
         assertNotNull(closedCaptions);
@@ -115,7 +111,7 @@ public class TestVideoToolsService extends BaseVideoToolsTest {
 
     @Test
     public void testSlice() throws IOException {
-        Blob video = getTestVideo(TEST_VIDEO);
+        Blob video = getTestVideo(TEST_VIDEO_WITH_CC);
         Blob slicedVideo = service.slice(video, "00:02", "00:04");
 
         assertNotNull(slicedVideo);
@@ -127,7 +123,7 @@ public class TestVideoToolsService extends BaseVideoToolsTest {
 
     @Test
     public void testSliceEqualParts() throws IOException {
-        Blob video = getTestVideo(TEST_VIDEO);
+        Blob video = getTestVideo(TEST_VIDEO_WITH_CC);
         BlobList slicedVideos = service.slice(video, "30");
 
         assertNotNull(slicedVideos);
