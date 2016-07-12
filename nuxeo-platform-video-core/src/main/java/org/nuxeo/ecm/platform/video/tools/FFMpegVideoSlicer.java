@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 
+import org.nuxeo.common.Environment;
 import org.nuxeo.common.utils.FileUtils;
 import org.nuxeo.ecm.automation.core.util.BlobList;
 import org.nuxeo.ecm.core.api.Blob;
@@ -46,6 +47,15 @@ public class FFMpegVideoSlicer implements VideoSlicer {
     protected DecimalFormat s_msFormat = new DecimalFormat("#.###");
 
     protected String commandLineName = COMMAND_SLICER_DEFAULT;
+
+    protected String basePath = Environment.getDefault().getTemp().getPath() + "/NuxeoVideoTools";
+
+    public FFMpegVideoSlicer() {
+        File tempDir = new File(basePath);
+        if (!tempDir.exists()) {
+            tempDir.mkdirs();
+        }
+    }
 
     /**
      * Slices the video at startAt for duration and returns a new blob
@@ -140,8 +150,7 @@ public class FFMpegVideoSlicer implements VideoSlicer {
                     params.addNamedParameter("sourceFilePath", sourceBlobFile.getFile().getAbsolutePath());
                     params.addNamedParameter("duration", duration);
 
-                    File folder = new File(VideoToolsUtilities.getTempDirectoryPath() + "/" + "Segments-"
-                            + java.util.UUID.randomUUID().toString().replace("-", ""));
+                    File folder = new File(basePath + "/Segments" + System.currentTimeMillis());
                     folder.mkdir();
                     String outFilePattern = folder.getAbsolutePath() + "/"
                             + VideoToolsUtilities.addSuffixToFileName(input.getFilename(), "-%03d");
@@ -149,7 +158,6 @@ public class FFMpegVideoSlicer implements VideoSlicer {
 
                     CommandLineExecutorService cles = Framework.getService(CommandLineExecutorService.class);
                     ExecResult clResult = cles.execCommand(COMMAND_SLICER_SEGMENTS, params);
-
                     // Get the result, and first, handle errors.
                     if (clResult.getError() != null) {
                         System.out.println("Failed to execute the command <" + COMMAND_SLICER_SEGMENTS + "> : "

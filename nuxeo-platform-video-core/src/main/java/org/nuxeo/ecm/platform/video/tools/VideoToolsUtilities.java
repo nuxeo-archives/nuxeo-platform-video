@@ -20,16 +20,14 @@
 package org.nuxeo.ecm.platform.video.tools;
 
 import org.nuxeo.common.Environment;
+import org.nuxeo.common.utils.Path;
+
 import java.io.File;
 
 /**
  * @since 8.4
  */
 public class VideoToolsUtilities {
-
-    private static final File VIDEOTOOLS_TEMP_DIR = new File(Environment.getDefault().getProperty(Environment.NUXEO_TMP_DIR) + "/NuxeoVideoTools");
-
-    private static String VIDEOTOOLS_TEMP_DIR_PATH;
 
     /**
      * Build a filename, inserting the suffix between the file extension.
@@ -52,21 +50,5 @@ public class VideoToolsUtilities {
 
         return filename.substring(0, dotIndex) + suffix
                 + filename.substring(dotIndex);
-    }
-
-    /**
-     * Return the temporary directory path for the video tools.
-     * @return
-     */
-    public static String getTempDirectoryPath() {
-        if(VIDEOTOOLS_TEMP_DIR_PATH == null) {
-            synchronized (VIDEOTOOLS_TEMP_DIR) {
-                if(VIDEOTOOLS_TEMP_DIR_PATH == null) {
-                    VIDEOTOOLS_TEMP_DIR.mkdir();
-                    VIDEOTOOLS_TEMP_DIR_PATH = VIDEOTOOLS_TEMP_DIR.getAbsolutePath();
-                }
-            }
-        }
-        return VIDEOTOOLS_TEMP_DIR_PATH;
     }
 }
