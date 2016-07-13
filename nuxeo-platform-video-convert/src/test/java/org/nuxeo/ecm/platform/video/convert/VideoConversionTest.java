@@ -60,7 +60,7 @@ import org.nuxeo.runtime.test.runner.FeaturesRunner;
 @RunWith(FeaturesRunner.class)
 @Features(CoreFeature.class)
 @Deploy({ "org.nuxeo.ecm.core.convert.api", "org.nuxeo.ecm.platform.commandline.executor",
-        "org.nuxeo.ecm.platform.convert", "org.nuxeo.ecm.platform.video.convert" })
+        "org.nuxeo.ecm.platform.video.convert" })
 public class VideoConversionTest {
 
     public static final Log log = LogFactory.getLog(VideoConversionTest.class);
@@ -83,7 +83,6 @@ public class VideoConversionTest {
 
     protected BlobHolder applyConverter(String converter, String fileName, String mimeType, long newHeight)
             throws Exception {
-        cs = Framework.getService(ConversionService.class);
         assertNotNull(cs.getRegistredConverters().contains(converter));
         BlobHolder in = getBlobFromPath(fileName, mimeType);
         Map<String, Serializable> parameters = new HashMap<>();
