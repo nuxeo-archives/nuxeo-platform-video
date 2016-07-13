@@ -24,7 +24,7 @@ import org.nuxeo.common.xmap.annotation.XObject;
 import java.io.Serializable;
 
 /**
- * Object representing a registered video tool on the {@link VideoToolsService}.
+ * Object representing a registered {@link VideoTool} on the {@link VideoToolsService}.
  *
  * @since 8.4
  */

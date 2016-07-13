@@ -36,8 +36,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Service for performing a set functions with videos.
- * It provides extension points for a watermark tool, a slice tool, a concat tool and closed captions extractor tool.
+ * The {@link VideoToolsService} default implementation for handling video blobs. It provides extension points for a
+ * {@link VideoWatermarker}, a {@link VideoSlicer}, a {@link VideoConcat} and a {@link VideoClosedCaptionsExtractor}.
  *
  * @since 8.4
  */
@@ -46,20 +46,25 @@ public class VideoToolsServiceImpl extends DefaultComponent implements VideoTool
     protected static final Log log = LogFactory.getLog(VideoToolsServiceImpl.class);
 
     protected static final String WATERMARK_TOOL = "watermarkTool";
-    protected static final String SLICER_TOOL = "sliceTool";
-    protected static final String CONCAT_TOOL = "concatTool";
-    protected static final String CC_EXTRACTOR_TOOL = "ccExtractorTool";
 
-    protected final Map<String, VideoToolDescriptor> toolDescriptors = new HashMap<>();
+    protected static final String SLICER_TOOL = "sliceTool";
+
+    protected static final String CONCAT_TOOL = "concatTool";
+
+    protected static final String CC_EXTRACTOR_TOOL = "closedCaptionsExtractorTool";
+
+    protected Map<String, VideoToolDescriptor> toolDescriptors;
 
     @Override
     public void activate(ComponentContext context) {
         super.activate(context);
+        toolDescriptors = new HashMap<>();
     }
 
     @Override
     public void deactivate(ComponentContext context) {
         super.deactivate(context);
+        toolDescriptors.clear();
     }
 
     @Override
@@ -108,11 +113,11 @@ public class VideoToolsServiceImpl extends DefaultComponent implements VideoTool
     }
 
     @Override
-    public Blob slice(Blob video, String startAt, String duration) {
+    public Blob slice(Blob video, String startAt, String duration, boolean encode) {
         if (toolDescriptors.containsKey(SLICER_TOOL)) {
             VideoToolDescriptor desc = toolDescriptors.get(SLICER_TOOL);
             VideoSlicer slicer = (VideoSlicer) desc.getVideoTool();
-            return slicer.slice(video, duration, startAt);
+            return slicer.slice(video, duration, startAt, encode);
         }
         return null;
     }

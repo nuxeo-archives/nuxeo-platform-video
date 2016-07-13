@@ -59,7 +59,8 @@ import org.nuxeo.runtime.test.runner.FeaturesRunner;
 
 @RunWith(FeaturesRunner.class)
 @Features(CoreFeature.class)
-@Deploy({ "org.nuxeo.ecm.core.api", "org.nuxeo.ecm.core.convert.api", "org.nuxeo.ecm.core.convert", "org.nuxeo.ecm.platform.commandline.executor", "org.nuxeo.ecm.platform.convert", "org.nuxeo.ecm.platform.video.convert"})
+@Deploy({ "org.nuxeo.ecm.core.convert.api", "org.nuxeo.ecm.platform.commandline.executor",
+        "org.nuxeo.ecm.platform.convert", "org.nuxeo.ecm.platform.video.convert" })
 public class VideoConversionTest {
 
     public static final Log log = LogFactory.getLog(VideoConversionTest.class);

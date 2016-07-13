@@ -26,8 +26,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.Blobs;
 import org.nuxeo.ecm.core.api.CloseableFile;
@@ -40,14 +38,13 @@ import org.nuxeo.ecm.platform.commandline.executor.api.ExecResult;
 import org.nuxeo.runtime.api.Framework;
 
 /**
- * The closed captions are extracted in a text file (depending on the requests output format)
+ *
+ * Default implementation of the {@link VideoClosedCaptionsExtractor} for extracting closed captions from video blobs.
+ * The closed captions are extracted in a text file (depending on the requests output format).
  *
  * @since 8.4
  */
 public class FFMpegCCExtractor implements VideoClosedCaptionsExtractor {
-
-    @SuppressWarnings("unused")
-    private static final Log log = LogFactory.getLog(FFMpegCCExtractor.class);
 
     public static final String COMMAND_FULL_VIDEO = "videoClosedCaptionsExtractor";
 
@@ -58,47 +55,22 @@ public class FFMpegCCExtractor implements VideoClosedCaptionsExtractor {
     public static final List<String> TEXT_OUTFORMATS = Collections.unmodifiableList(
             Arrays.asList("srt", "txt", "ttxt"));
 
-    protected String startAt;
-
-    protected String endAt;
-
-    protected static int ccextractorIsAvailable = -1;
-
-    protected Blob blob;
-
-    public static boolean ccextractorIsAvailable() {
-
-        if (ccextractorIsAvailable == -1) {
-            CommandLineExecutorService cles = Framework.getService(CommandLineExecutorService.class);
-            CommandAvailability ca = cles.getCommandAvailability(FFMpegCCExtractor.COMMAND_FULL_VIDEO);
-            ccextractorIsAvailable = ca.isAvailable() ? 1 : 0;
-        }
-
-        return ccextractorIsAvailable == 1;
-    }
-
     public Blob extract(Blob blob, String startAt, String endAt) throws CommandNotAvailable, IOException {
-        return extract(blob, startAt, endAt, null);
-    }
-
-    protected boolean isTextOutFormat(String inFormat) {
-        return TEXT_OUTFORMATS.contains(inFormat);
+        return extract(blob, startAt, endAt, DEFAULT_OUTFORMAT);
     }
 
     public Blob extract(Blob blob, String startAt, String endAt, String outputFormat) throws NuxeoException {
 
-        Blob blobCC = null;
+        if (blob == null) return null;
 
-        if (blob == null) {
-            return null;
-        }
-
+        Blob closedCaptions = null;
         try {
             CloseableFile sourceBlobFile = null;
             try {
-                CmdParameters params = new CmdParameters();
-
                 sourceBlobFile = blob.getCloseableFile();
+
+                // set the command line parameters
+                CmdParameters params = new CmdParameters();
                 params.addNamedParameter("sourceFilePath", sourceBlobFile.getFile().getAbsolutePath());
 
                 if (StringUtils.isBlank(outputFormat)) {
@@ -113,8 +85,8 @@ public class FFMpegCCExtractor implements VideoClosedCaptionsExtractor {
                     params.addNamedParameter("endAt", endAt);
                 }
 
-                blobCC = Blobs.createBlobWithExtension("." + outputFormat);
-                params.addNamedParameter("outFilePath", blobCC.getFile().getAbsolutePath());
+                closedCaptions = Blobs.createBlobWithExtension("." + outputFormat);
+                params.addNamedParameter("outFilePath", closedCaptions.getFile().getAbsolutePath());
 
                 CommandLineExecutorService cles = Framework.getService(CommandLineExecutorService.class);
                 ExecResult clResult = cles.execCommand(commandLineName, params);
@@ -134,12 +106,12 @@ public class FFMpegCCExtractor implements VideoClosedCaptionsExtractor {
                 // We must check if the file is empty or not, while handling BOMs of
                 // Unicode files.
                 // Let's say that less than 5 bytes, we don't have a caption.
-                File resultFile = blobCC.getFile();
+                File resultFile = closedCaptions.getFile();
                 if (resultFile.exists()) {
                     if (resultFile.length() > 5) {
-                        blobCC.setFilename(blob.getFilename() + "." + outputFormat);
+                        closedCaptions.setFilename(blob.getFilename() + "." + outputFormat);
                         if (isTextOutFormat(outputFormat)) {
-                            blobCC.setMimeType("text/plain");
+                            closedCaptions.setMimeType("text/plain");
                         }
                     }
                 }
@@ -155,22 +127,16 @@ public class FFMpegCCExtractor implements VideoClosedCaptionsExtractor {
             throw new NuxeoException("Command for closed captions extraction is not available. " + e.getMessage());
         }
 
-        return blobCC;
+        return closedCaptions;
     }
 
-    public String getStartAt() {
-        return startAt;
+    protected boolean isTextOutFormat(String inFormat) {
+        return TEXT_OUTFORMATS.contains(inFormat);
     }
 
-    public void setStartAt(String startAt) {
-        this.startAt = startAt;
-    }
-
-    public String getEndAt() {
-        return endAt;
-    }
-
-    public void setEndAt(String endAt) {
-        this.endAt = endAt;
+    public static boolean ccextractorIsAvailable() {
+        CommandLineExecutorService cles = Framework.getService(CommandLineExecutorService.class);
+        CommandAvailability ca = cles.getCommandAvailability(FFMpegCCExtractor.COMMAND_FULL_VIDEO);
+        return ca.isAvailable();
     }
 }

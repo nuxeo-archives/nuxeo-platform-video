@@ -23,6 +23,8 @@ import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.NuxeoException;
 
 /**
+ * The {@link VideoTool} that joins two or more video blots.
+ *
  * @since 8.4
  */
 public interface VideoConcat extends VideoTool {

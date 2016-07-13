@@ -4,6 +4,7 @@
     <videoTool name="watermarkTool" enabled="true" class="org.nuxeo.ecm.platform.video.tools.FFMpegVideoWatermarker"/>
     <videoTool name="sliceTool" enabled="true" class="org.nuxeo.ecm.platform.video.tools.FFMpegVideoSlicer"/>
     <videoTool name="concatTool" enabled="true" class="org.nuxeo.ecm.platform.video.tools.FFMpegVideoConcat"/>
-    <videoTool name="ccExtractorTool" enabled="true" class="org.nuxeo.ecm.platform.video.tools.FFMpegCCExtractor"/>
+    <videoTool name="closedCaptionsExtractorTool" enabled="true"
+               class="org.nuxeo.ecm.platform.video.tools.FFMpegCCExtractor"/>
   </extension>
 </component>

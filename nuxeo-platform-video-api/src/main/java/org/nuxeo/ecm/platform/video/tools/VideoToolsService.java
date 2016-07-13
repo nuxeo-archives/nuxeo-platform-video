@@ -22,12 +22,15 @@ import org.nuxeo.ecm.automation.core.util.BlobList;
 import org.nuxeo.ecm.core.api.Blob;
 
 /**
+ * Service that allows the execution of different operations in video blobs through the contribution of {@link VideoTool}.
+ *
  * @since 8.4
  */
 public interface VideoToolsService {
 
     /**
      * Extracts the closed captions from a video blob.
+     * 
      * @param video the input blob
      * @param outputFormat the outformat of the captions (srt, txt, ttxt is the default)
      * @param startAt the start time in format "xx:xx"
@@ -38,13 +41,15 @@ public interface VideoToolsService {
 
     /**
      * Concat the input video blobs into a single video blob.
+     * 
      * @param videos the input videos
      * @return
      */
-    Blob concat(Blob ... videos);
+    Blob concat(Blob... videos);
 
     /**
      * Concat the input video blobs into a single video blob.
+     * 
      * @param videos
      * @return
      */
@@ -52,15 +57,18 @@ public interface VideoToolsService {
 
     /**
      * Slice a video blob from a start time and the input duration.
+     * 
      * @param video the input blob
      * @param startAt the start time in "xx:xx" format
      * @param duration the duration of the sliced blob in seconds
+     * @param encode option to re-encode the ouptut video blob
      * @return
      */
-    Blob slice(Blob video, String startAt, String duration);
+    Blob slice(Blob video, String startAt, String duration, boolean encode);
 
     /**
      * Slice a video blob in n-parts with similar duration.
+     * 
      * @param video the input blob
      * @param duration the approximate duration of each part
      * @return
@@ -69,6 +77,7 @@ public interface VideoToolsService {
 
     /**
      * Add a watermark to a video blob.
+     * 
      * @param video the input blob
      * @param picture the picture blob to be used as the watermark
      * @param x the x offset starting from the left

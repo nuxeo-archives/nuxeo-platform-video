@@ -37,20 +37,17 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
-import org.nuxeo.ecm.platform.test.PlatformFeature;
 import org.nuxeo.ecm.platform.video.VideoHelper;
 import org.nuxeo.ecm.platform.video.VideoInfo;
-import org.nuxeo.ecm.platform.video.tools.operations.AddWatermark;
-import org.nuxeo.ecm.platform.video.tools.operations.Concat;
-import org.nuxeo.ecm.platform.video.tools.operations.ExtractClosedCaptions;
-import org.nuxeo.ecm.platform.video.tools.operations.Slice;
-import org.nuxeo.ecm.platform.video.tools.operations.SliceInParts;
-import org.nuxeo.runtime.test.runner.Deploy;
+import org.nuxeo.ecm.platform.video.tools.operations.AddWatermarkToVideo;
+import org.nuxeo.ecm.platform.video.tools.operations.ConcatVideos;
+import org.nuxeo.ecm.platform.video.tools.operations.ExtractClosedCaptionsFromVideo;
+import org.nuxeo.ecm.platform.video.tools.operations.SliceVideo;
+import org.nuxeo.ecm.platform.video.tools.operations.SliceVideoInParts;
 import org.nuxeo.runtime.test.runner.Features;
 import org.nuxeo.runtime.test.runner.FeaturesRunner;
 
 import com.google.inject.Inject;
-import org.nuxeo.runtime.test.runner.LocalDeploy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -61,14 +58,7 @@ import static org.junit.Assert.assertTrue;
  * @since 8.4
  */
 @RunWith(FeaturesRunner.class)
-@Features({ PlatformFeature.class })
-@Deploy({ "org.nuxeo.ecm.automation.core", "org.nuxeo.ecm.platform.commandline.executor",
-        "org.nuxeo.ecm.platform.video.convert", "org.nuxeo.ecm.platform.picture.core" })
-@LocalDeploy({ "org.nuxeo.ecm.platform.video.core:OSGI-INF/core-types-contrib.xml",
-        "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-operations-contrib.xml",
-        "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-commandlines-contrib.xml",
-        "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-service.xml",
-        "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-default-contrib.xml" })
+@Features(VideoToolsFeatures.class)
 public class TestVideoToolsOperations extends BaseVideoToolsTest {
 
     public static final String WATERMARK_PICTURE = "test-data/logo.jpeg";
@@ -106,7 +96,7 @@ public class TestVideoToolsOperations extends BaseVideoToolsTest {
         OperationContext ctx = new OperationContext(coreSession);
         ctx.setInput(videoDoc);
         OperationChain chain = new OperationChain("testAddWatermark");
-        chain.add(AddWatermark.ID)
+        chain.add(AddWatermarkToVideo.ID)
              .set("watermark", watermarkDoc)
              .set("xpath", "file:content")
              .set("x", "5")
@@ -131,7 +121,7 @@ public class TestVideoToolsOperations extends BaseVideoToolsTest {
         OperationContext ctx = new OperationContext(coreSession);
         ctx.setInput(docList);
         OperationChain chain = new OperationChain("testConcatTool");
-        chain.add(Concat.ID);
+        chain.add(ConcatVideos.ID);
 
         Blob resultBlob = (Blob) service.run(ctx, chain);
         assertNotNull(resultBlob);
@@ -147,7 +137,7 @@ public class TestVideoToolsOperations extends BaseVideoToolsTest {
         OperationContext ctx = new OperationContext(coreSession);
         ctx.setInput(doc);
         OperationChain chain = new OperationChain("testSliceTool");
-        chain.add(Slice.ID).set("startAt", "00:02").set("duration", "00:04");
+        chain.add(SliceVideo.ID).set("startAt", "00:02").set("duration", "00:04");
 
         Blob sliceVideo = (Blob) service.run(ctx, chain);
 
@@ -165,7 +155,7 @@ public class TestVideoToolsOperations extends BaseVideoToolsTest {
         OperationContext ctx = new OperationContext(coreSession);
         ctx.setInput(doc);
         OperationChain chain = new OperationChain("testSliceInPartsTool");
-        chain.add(SliceInParts.ID).set("duration", "30");
+        chain.add(SliceVideoInParts.ID).set("duration", "30");
 
         BlobList slices = (BlobList) service.run(ctx, chain);
         assertNotNull(slices);
@@ -183,7 +173,7 @@ public class TestVideoToolsOperations extends BaseVideoToolsTest {
         OperationContext ctx = new OperationContext(coreSession);
         ctx.setInput(videoWithCC);
         OperationChain chain = new OperationChain("testExtractClosedCaptions");
-        chain.add(ExtractClosedCaptions.ID).set("outFormat", "ttxt");
+        chain.add(ExtractClosedCaptionsFromVideo.ID).set("outFormat", "ttxt");
 
         Blob closedCaptions = (Blob) service.run(ctx, chain);
         assertNotNull(closedCaptions);
@@ -201,7 +191,7 @@ public class TestVideoToolsOperations extends BaseVideoToolsTest {
         OperationContext ctx = new OperationContext(coreSession);
         ctx.setInput(videoWithCC);
         OperationChain chain = new OperationChain("testExtractClosedCaptions");
-        chain.add(ExtractClosedCaptions.ID).set("outFormat", "ttxt").set("startAt", "00:10").set("endAt", "00:20");
+        chain.add(ExtractClosedCaptionsFromVideo.ID).set("outFormat", "ttxt").set("startAt", "00:10").set("endAt", "00:20");
 
         Blob closedCaptions = (Blob) service.run(ctx, chain);
         assertNotNull(closedCaptions);

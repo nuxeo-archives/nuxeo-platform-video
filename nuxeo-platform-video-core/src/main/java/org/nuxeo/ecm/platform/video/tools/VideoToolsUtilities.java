@@ -19,27 +19,21 @@
  */
 package org.nuxeo.ecm.platform.video.tools;
 
-import org.nuxeo.common.Environment;
-import org.nuxeo.common.utils.Path;
-
-import java.io.File;
-
 /**
  * @since 8.4
  */
 public class VideoToolsUtilities {
 
     /**
-     * Build a filename, inserting the suffix between the file extension.
-     * If the fileName has no extension, the suffix is just added.
-     * (if the suffix is null or empty, nothing happens)
+     * Build a filename, inserting the suffix between the file extension. If the fileName has no extension, the suffix
+     * is just added. (if the suffix is null or empty, nothing happens)
+     * 
      * @param filename
      * @param suffix
      * @return
      */
     public static String addSuffixToFileName(String filename, String suffix) {
-        if (filename == null || filename.isEmpty() || suffix == null
-                || suffix.isEmpty()) {
+        if (filename == null || filename.isEmpty() || suffix == null || suffix.isEmpty()) {
             return filename;
         }
 
@@ -48,7 +42,6 @@ public class VideoToolsUtilities {
             return filename + suffix;
         }
 
-        return filename.substring(0, dotIndex) + suffix
-                + filename.substring(dotIndex);
+        return filename.substring(0, dotIndex) + suffix + filename.substring(dotIndex);
     }
 }

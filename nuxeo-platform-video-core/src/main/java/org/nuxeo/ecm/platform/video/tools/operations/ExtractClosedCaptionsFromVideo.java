@@ -19,6 +19,9 @@
  */
 package org.nuxeo.ecm.platform.video.tools.operations;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.commons.lang.StringUtils;
 import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.automation.core.Constants;
@@ -31,27 +34,29 @@ import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.NuxeoException;
+import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
 import org.nuxeo.ecm.platform.video.tools.VideoToolsService;
 import org.nuxeo.runtime.api.Framework;
 
 /**
- * Slices the video to obtain a part of it.
+ * Extracts Closed Captions from a Video.
+ * 
  * @since 8.4
  */
-@Operation(id = Slice.ID, category = Constants.CAT_CONVERSION, label = "Slice the ivdeo for a given duration and startAt time.", description = "Slice the input blob starting at startAt, for a certain duration. A specific converter can be used.", aliases = {
-        "Video.Slice" })
-public class Slice {
+@Operation(id = ExtractClosedCaptionsFromVideo.ID, category = Constants.CAT_CONVERSION, label = "Extracts closed captions from the video.", description = "Extracts the closed captions from the whole video or from a part of it when startAt and end time is provided. The output format references how the output is generated, and xpath can be used to indicate the video blob when using documents.", aliases = {
+        "Video.ExtractClosedCaptions" })
+public class ExtractClosedCaptionsFromVideo {
 
-    public static final String ID = "Video.Slice";
+    public static final String ID = "Video.ExtractClosedCaptions";
+
+    @Param(name = "outFormat", required = false, values = { "txt" })
+    protected String outFormat;
 
     @Param(name = "startAt", required = false)
     protected String startAt;
 
-    @Param(name = "duration", required = false)
-    protected String duration;
-
-    @Param(name = "commandLine", required = false, values = { "videoSlicer" })
-    protected String commandLine;
+    @Param(name = "endAt", required = false)
+    protected String endAt;
 
     @Param(name = "xpath", required = false, values = { "file:content" })
     protected String xpath;
@@ -66,20 +71,28 @@ public class Slice {
     public BlobList run(DocumentModelList input) throws OperationException {
         BlobList blobList = new BlobList();
         for (DocumentModel doc : input) {
-            blobList.add(run(doc));
+            blobList.add((run(doc)));
         }
         return blobList;
     }
 
     @OperationMethod(collector = BlobCollector.class)
     public Blob run(Blob input) throws OperationException {
-        VideoToolsService videoService = Framework.getService(VideoToolsService.class);
-        /*if (commandLine != null && !commandLine.isEmpty()) {
-            videoSlicer.setCommandLineName(commandLine);
-        }*/
         try {
-            return videoService.slice(input, startAt, duration);
-        } catch(NuxeoException e) {
+            VideoToolsService service = Framework.getService(VideoToolsService.class);
+            Blob result = service.extractClosedCaptions(input, outFormat, startAt, endAt);
+            if (result == null) {
+                File tempFile = Framework.createTempFile("NxVT-", "txt");
+                tempFile.deleteOnExit();
+                Framework.trackFile(tempFile, this);
+                result = new FileBlob(tempFile);
+                result.setMimeType("text/plain");
+                result.setFilename(input.getFilename() + "-noCC.txt");
+            }
+            return result;
+        } catch (IOException e) {
+            throw new OperationException("Cannot extract closed captions from blob. " + e.getMessage());
+        } catch (NuxeoException e) {
             throw new OperationException(e.getMessage());
         }
     }

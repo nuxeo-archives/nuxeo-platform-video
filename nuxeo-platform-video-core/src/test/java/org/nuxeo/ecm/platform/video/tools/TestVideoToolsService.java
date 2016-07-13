@@ -25,17 +25,11 @@ import org.nuxeo.common.utils.FileUtils;
 import org.nuxeo.ecm.automation.core.util.BlobList;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.Blobs;
-import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
-import org.nuxeo.ecm.core.test.CoreFeature;
-import org.nuxeo.ecm.core.test.annotations.Granularity;
-import org.nuxeo.ecm.core.test.annotations.RepositoryConfig;
 import org.nuxeo.ecm.platform.video.VideoHelper;
 import org.nuxeo.ecm.platform.video.VideoInfo;
-import org.nuxeo.runtime.test.runner.Deploy;
 import org.nuxeo.runtime.test.runner.Features;
 import org.nuxeo.runtime.test.runner.FeaturesRunner;
-import org.nuxeo.runtime.test.runner.LocalDeploy;
 
 import javax.inject.Inject;
 
@@ -50,17 +44,8 @@ import static org.junit.Assert.assertTrue;
  * @since 8.4
  */
 @RunWith(FeaturesRunner.class)
-@Features(CoreFeature.class)
-@RepositoryConfig(cleanup = Granularity.METHOD)
-@Deploy({ "org.nuxeo.ecm.automation.core", "org.nuxeo.ecm.platform.commandline.executor",
-      "org.nuxeo.ecm.platform.video.convert"})
-@LocalDeploy({ "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-commandlines-contrib.xml",
-        "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-service.xml",
-        "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-default-contrib.xml" })
+@Features(VideoToolsFeatures.class)
 public class TestVideoToolsService extends BaseVideoToolsTest {
-
-    @Inject
-    protected CoreSession session;
 
     @Inject
     protected VideoToolsService service;
@@ -112,7 +97,7 @@ public class TestVideoToolsService extends BaseVideoToolsTest {
     @Test
     public void testSlice() throws IOException {
         Blob video = getTestVideo(TEST_VIDEO_WITH_CC);
-        Blob slicedVideo = service.slice(video, "00:02", "00:04");
+        Blob slicedVideo = service.slice(video, "00:02", "00:04", false);
 
         assertNotNull(slicedVideo);
         assertTrue(slicedVideo.getLength() > 0);

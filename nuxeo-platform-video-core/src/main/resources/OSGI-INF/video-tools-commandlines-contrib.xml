@@ -20,7 +20,7 @@
       <installationDirective>You need to install ccextractor.</installationDirective>
     </command>
 
-    <command name="concatVideos-demuxer" enabled="true">
+    <command name="videoConcat" enabled="true">
       <commandLine>ffmpeg</commandLine>
       <parameterString>-y -f concat -safe 0 -i #{listFilePath} -c copy #{outFilePath}</parameterString>
       <installationDirective>You need to install ffmpeg.</installationDirective>

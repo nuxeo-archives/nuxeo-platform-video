@@ -25,61 +25,43 @@ import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
 import org.nuxeo.ecm.automation.core.annotations.Param;
-import org.nuxeo.ecm.automation.core.collectors.BlobCollector;
 import org.nuxeo.ecm.automation.core.util.BlobList;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.platform.video.tools.VideoToolsService;
 import org.nuxeo.runtime.api.Framework;
 
 /**
- * Watermark a Video with the given Picture, at the given position (from top-left).
+ * Operation for slicing a video in parts with approximately equal duration.
  *
  * @since 8.4
  */
-@Operation(id = AddWatermark.ID, category = Constants.CAT_CONVERSION, label = "Watermarks a Video with a Picture", description = "Watermark the video with the picture stored in file:content of watermark, at the position(x, y) from the left-top corner of the picture.", aliases = {"Video.AddWatermark"})
-public class AddWatermark {
+@Operation(id = SliceVideoInParts.ID, category = Constants.CAT_CONVERSION, label = "SliceVideo a Video in Parts with equal duration.", description = "Slices the video in n parts of approximately the same duration each.", aliases = {
+        "Video.SliceInParts" })
+public class SliceVideoInParts {
 
-    public static final String ID = "Video.AddWatermark";
+    public static final String ID = "Video.SliceInParts";
 
-    @Param(name = "watermark", required = true)
-    protected DocumentModel watermark;
-
-    @Param(name = "x", required = false, values = { "0" })
-    protected String x;
-
-    @Param(name = "y", required = false, values = { "0" })
-    protected String y;
+    @Param(name = "duration", required = false)
+    protected String duration;
 
     @Param(name = "xpath", required = false, values = { "file:content" })
     protected String xpath;
 
     @OperationMethod
-    public Blob run(DocumentModel input) throws OperationException {
+    public BlobList run(DocumentModel input) throws OperationException {
         String blobPath = (!StringUtils.isEmpty(xpath))? xpath : "file:content";
         return run((Blob) input.getPropertyValue(blobPath));
     }
 
     @OperationMethod
-    public BlobList run(DocumentModelList input) throws OperationException {
-        BlobList blobList = new BlobList();
-        String blobPath = (!StringUtils.isEmpty(xpath))? xpath : "file:content";
-        for (DocumentModel doc : input) {
-            blobList.add(run((Blob) doc.getPropertyValue(blobPath)));
-        }
-        return blobList;
-    }
-
-    @OperationMethod(collector = BlobCollector.class)
-    public Blob run(Blob input) throws OperationException {
-        Blob watermarkBlob = (Blob) watermark.getPropertyValue("file:content");
+    public BlobList run(Blob input) throws OperationException {
         try {
             VideoToolsService service = Framework.getService(VideoToolsService.class);
-            return service.watermark(input, watermarkBlob, x, y);
-        } catch (NuxeoException e) {
-            throw new OperationException("Cannot add the watermark to the video. " + e.getMessage());
+            return service.slice(input, duration);
+        } catch(NuxeoException e){
+            throw new OperationException(e.getMessage());
         }
     }
 }

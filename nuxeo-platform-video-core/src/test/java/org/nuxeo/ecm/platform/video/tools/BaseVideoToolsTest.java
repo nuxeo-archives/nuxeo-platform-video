@@ -54,7 +54,6 @@ public abstract class BaseVideoToolsTest {
     protected String fileBlobToString(FileBlob inBlob) throws IOException {
         File f = inBlob.getFile();
         Path p = Paths.get(f.getAbsolutePath());
-
         return new String(Files.readAllBytes(p));
     }
 }

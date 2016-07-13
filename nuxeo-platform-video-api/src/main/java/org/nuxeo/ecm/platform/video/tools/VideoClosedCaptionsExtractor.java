@@ -22,6 +22,8 @@ import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.NuxeoException;
 
 /**
+ * The {@link VideoTool} that extracts closed captions.
+ *
  * @since 8.4
  */
 public interface VideoClosedCaptionsExtractor extends VideoTool {

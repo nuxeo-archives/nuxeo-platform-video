@@ -1,24 +1,26 @@
 /*
- * (C) Copyright 2014 Nuxeo SA (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2016 Nuxeo SA (http://nuxeo.com/) and others.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * Contributors:
  *     Thibaud Arguillere
+ *     Ricardo Dias
  */
 package org.nuxeo.ecm.platform.video.tools;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DecimalFormat;
 
 import org.nuxeo.common.Environment;
 import org.nuxeo.common.utils.FileUtils;
@@ -36,17 +38,18 @@ import org.nuxeo.ecm.platform.video.VideoHelper;
 import org.nuxeo.ecm.platform.video.VideoInfo;
 import org.nuxeo.runtime.api.Framework;
 
+/**
+ * Default implementation of the {@link VideoSlicer} using the ffmpeg command line contribution.
+ *
+ * @since 8.4
+ */
 public class FFMpegVideoSlicer implements VideoSlicer {
 
-    public static final String COMMAND_SLICER_DEFAULT = "videoSlicer";
+    private static final String COMMAND_SLICER_DEFAULT = "videoSlicer";
 
-    public static final String COMMAND_SLICER_BY_COPY = "videoSlicerByCopy";
+    private static final String COMMAND_SLICER_BY_COPY = "videoSlicerByCopy";
 
-    public static final String COMMAND_SLICER_SEGMENTS = "videoSlicerSegments";
-
-    protected DecimalFormat s_msFormat = new DecimalFormat("#.###");
-
-    protected String commandLineName = COMMAND_SLICER_DEFAULT;
+    private static final String COMMAND_SLICER_SEGMENTS = "videoSlicerSegments";
 
     protected String basePath = Environment.getDefault().getTemp().getPath() + "/NuxeoVideoTools";
 
@@ -57,23 +60,14 @@ public class FFMpegVideoSlicer implements VideoSlicer {
         }
     }
 
-    /**
-     * Slices the video at startAt for duration and returns a new blob
-     *
-     * @param input
-     * @param duration
-     * @param startAt
-     * @return Blob, slice of the original
-     * @throws NuxeoException
-     * @since 8.4
-     */
-    public Blob slice(Blob input, String duration, String startAt) throws NuxeoException {
+    public Blob slice(Blob input, String duration, String startAt, boolean encode) throws NuxeoException {
 
         Blob sliced = null;
+        String COMMAND_SLICER = (encode) ? COMMAND_SLICER_DEFAULT : COMMAND_SLICER_BY_COPY;
 
         try {
             // Get the final name, adding startAt/duration to the original name
-            String finalFileName = VideoToolsUtilities.addSuffixToFileName(input.getFilename(),
+            String finalFilename = VideoToolsUtilities.addSuffixToFileName(input.getFilename(),
                     "-" + startAt.replaceAll(":", "") + "-" + duration.replaceAll(":", ""));
 
             CloseableFile sourceBlobFile = null;
@@ -82,30 +76,29 @@ public class FFMpegVideoSlicer implements VideoSlicer {
 
                 CmdParameters params = new CmdParameters();
                 params.addNamedParameter("sourceFilePath", sourceBlobFile.getFile().getAbsolutePath());
-
                 params.addNamedParameter("start", startAt);
                 params.addNamedParameter("duration", duration);
 
-                String ext = FileUtils.getFileExtension(finalFileName);
+                String ext = FileUtils.getFileExtension(finalFilename);
                 sliced = Blobs.createBlobWithExtension("." + ext);
                 params.addNamedParameter("outFilePath", sliced.getFile().getAbsolutePath());
 
                 CommandLineExecutorService cles = Framework.getService(CommandLineExecutorService.class);
-                ExecResult clResult = cles.execCommand(commandLineName, params);
+                ExecResult clResult = cles.execCommand(COMMAND_SLICER, params);
 
                 // Get the result, and first, handle errors.
                 if (clResult.getError() != null) {
-                    throw new NuxeoException("Failed to execute the command <" + commandLineName + ">",
+                    throw new NuxeoException("Failed to execute the command <" + COMMAND_SLICER + ">",
                             clResult.getError());
                 }
 
                 if (!clResult.isSuccessful()) {
-                    throw new NuxeoException("Failed to execute the command <" + commandLineName + ">. Final command [ "
+                    throw new NuxeoException("Failed to execute the command <" + COMMAND_SLICER + ">. Final command [ "
                             + clResult.getCommandLine() + " ] returned with error " + clResult.getReturnCode());
                 }
 
                 // Build the Blob
-                sliced.setFilename(finalFileName);
+                sliced.setFilename(finalFilename);
                 sliced.setMimeType(input.getMimeType());
 
             } finally {
@@ -113,30 +106,20 @@ public class FFMpegVideoSlicer implements VideoSlicer {
                     sourceBlobFile.close();
                 }
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new NuxeoException("Could not slice the video." + e.getMessage());
         } catch (CommandNotAvailable e) {
-            throw new NuxeoException("Slice command is not available. "+ e.getMessage());
+            throw new NuxeoException("SliceVideo command is not available. " + e.getMessage());
         }
 
         return sliced;
     }
 
-    /**
-     * Slices the video in n segments of inDuration each (with possible approximations)
-     *
-     * @param input
-     * @param duration
-     * @return 1-n blobs of same duration (with the last one adjusted)
-     * @throws NuxeoException
-     * @since 7.1
-     */
     public BlobList slice(Blob input, String duration) throws NuxeoException {
 
         BlobList parts = new BlobList();
 
         VideoInfo vi = VideoHelper.getVideoInfo(input);
-
         if (Double.valueOf(duration) >= vi.getDuration()) {
             parts.add(input);
         } else {
@@ -187,22 +170,14 @@ public class FFMpegVideoSlicer implements VideoSlicer {
                         sourceBlobFile.close();
                     }
                 }
-            } catch(IOException e) {
+            } catch (IOException e) {
                 throw new NuxeoException("Could not slice the video." + e.getMessage());
             } catch (CommandNotAvailable e) {
-                throw new NuxeoException("Slice command is not available. "+ e.getMessage());
+                throw new NuxeoException("SliceVideo command is not available. " + e.getMessage());
             }
 
         }
 
         return parts.size() == 0 ? null : parts;
-    }
-
-    public void setCommandLineName(String inCommandLineName) {
-        commandLineName = inCommandLineName;
-    }
-
-    public String getCommandLineName() {
-        return commandLineName;
     }
 }

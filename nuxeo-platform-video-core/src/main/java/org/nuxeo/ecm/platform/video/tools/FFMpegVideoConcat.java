@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.nuxeo.common.utils.FileUtils;
 import org.nuxeo.ecm.automation.core.util.BlobList;
@@ -34,17 +35,9 @@ import org.nuxeo.ecm.platform.commandline.executor.api.ExecResult;
 import org.nuxeo.runtime.api.Framework;
 
 /**
- * We use ffmpeg demuxer (see https://trac.ffmpeg.org/wiki/Concatenate) Syntax is: ffmpeg -f concat -i mylist.txt -c
- * copy output
- * <p>
- * With mylist.txt: <code>
- * file '/path/to/file1'
- * file '/path/to/file2'
- * file '/path/to/file3'
- * </code>
- * <p>
- * Quote from ffmpeg doc:
- * <p>
+ * Default implementation of the {@link VideoConcat} tool, using the ffmpeg demuxer (see
+ * https://trac.ffmpeg.org/wiki/Concatenate).
+ *
  * <quote> The timestamps in the files are adjusted so that the first file starts at 0 and each next file starts where
  * the previous one finishes. Note that it is done globally and may cause gaps if all streams do not have exactly the
  * same length. All files must have the same streams (same codecs, same time base, etc.). The duration of each file is
@@ -53,16 +46,13 @@ import org.nuxeo.runtime.api.Framework;
  * to override the duration stored in each file. [snip] The concat demuxer can support variable frame rate, but it
  * currently requires that all files have the same time base for the corresponding files. </quote> So basically, this
  * will work with movies of the same type and same timestamps.
- * 
- * @since 7.1
+ *
+ * @since 8.4
  */
 public class FFMpegVideoConcat implements VideoConcat {
 
-    protected static final String COMMAND_CONCAT_VIDEOS_DEMUXER = "concatVideos-demuxer";
+    private static final String COMMAND_CONCAT_VIDEOS = "videoConcat";
 
-    /*
-     * The command line is: ffmpeg -f concat -i #{listFilePath} -c copy #{outFilePath}
-     */
     public Blob concat(BlobList blobs) throws NuxeoException {
 
         Blob result = null;
@@ -76,7 +66,7 @@ public class FFMpegVideoConcat implements VideoConcat {
         originalMimeType = blobs.get(0).getMimeType();
 
         try {
-            ArrayList<CloseableFile> sourceClosableFiles = new ArrayList<CloseableFile>();
+            List<CloseableFile> sourceClosableFiles = new ArrayList<>();
             File tempFile = null;
             try {
 
@@ -102,18 +92,18 @@ public class FFMpegVideoConcat implements VideoConcat {
                 params.addNamedParameter("outFilePath", outputFilePath);
 
                 CommandLineExecutorService cles = Framework.getService(CommandLineExecutorService.class);
-                ExecResult clResult = cles.execCommand(COMMAND_CONCAT_VIDEOS_DEMUXER, params);
+                ExecResult clResult = cles.execCommand(COMMAND_CONCAT_VIDEOS, params);
 
                 // Get the result, and first, handle errors.
                 if (clResult.getError() != null) {
-                    throw new NuxeoException("Failed to execute the command <" + COMMAND_CONCAT_VIDEOS_DEMUXER + ">",
+                    throw new NuxeoException("Failed to execute the command <" + COMMAND_CONCAT_VIDEOS + ">",
                             clResult.getError());
                 }
 
                 if (!clResult.isSuccessful()) {
-                    throw new NuxeoException("Failed to execute the command <" + COMMAND_CONCAT_VIDEOS_DEMUXER
-                            + ">. Final command [ " + clResult.getCommandLine() + " ] returned with error "
-                            + clResult.getReturnCode());
+                    throw new NuxeoException(
+                            "Failed to execute the command <" + COMMAND_CONCAT_VIDEOS + ">. Final command [ "
+                                    + clResult.getCommandLine() + " ] returned with error " + clResult.getReturnCode());
                 }
 
                 // Update the Blob
@@ -131,9 +121,9 @@ public class FFMpegVideoConcat implements VideoConcat {
                     tempFile.delete();
                 }
             }
-        } catch(IOException e){
+        } catch (IOException e) {
             throw new NuxeoException("Could not concat video blobs. " + e.getMessage());
-        } catch(CommandNotAvailable e){
+        } catch (CommandNotAvailable e) {
             throw new NuxeoException("Command to slice video blobs is not available. " + e.getMessage());
         }
 
@@ -142,7 +132,7 @@ public class FFMpegVideoConcat implements VideoConcat {
 
     public Blob concat(Blob... blobs) throws NuxeoException {
         BlobList blobList = new BlobList();
-        for (int i = 0 ; i < blobs.length; i++) {
+        for (int i = 0; i < blobs.length; i++) {
             blobList.add(blobs[i]);
         }
         return concat(blobList);

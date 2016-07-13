@@ -33,19 +33,13 @@ import org.nuxeo.ecm.platform.commandline.executor.api.ExecResult;
 import org.nuxeo.runtime.api.Framework;
 
 /**
- * Default implementation of the VideoWatermarker.
+ * Default implementation of the {@link VideoWatermarker} using the ffmpeg commandline contribution.
  *
  * @since 8.4
  */
 public class FFMpegVideoWatermarker implements VideoWatermarker {
 
-    /* The command line is:
-     * ffmpeg -y -i #{sourceFilePath} -i #{pictureFilePath} -filter_complex #{filterComplex} #{outFilePath}
-     *
-     * filterComplex will be replaced with "overlay=10:10" (with 10:10 s an example)
-     *
-     */
-    protected static final String COMMAND_WATERMARK_WITH_PICTURE = "videoWatermarkWithPicture";
+    private static final String COMMAND_WATERMARK_WITH_PICTURE = "videoWatermarkWithPicture";
 
     public Blob watermark(Blob input, Blob watermark, String x, String y) throws NuxeoException {
 
@@ -58,12 +52,12 @@ public class FFMpegVideoWatermarker implements VideoWatermarker {
             String overlay = "overlay=" + x + ":" + y;
 
             CloseableFile sourceBlobFile = null, pictBlobFile = null;
-            CmdParameters params = new CmdParameters();
             try {
                 sourceBlobFile = input.getCloseableFile();
                 pictBlobFile = watermark.getCloseableFile();
 
                 // Prepare command line parameters
+                CmdParameters params = new CmdParameters();
                 params.addNamedParameter("sourceFilePath", sourceBlobFile.getFile().getAbsolutePath());
                 params.addNamedParameter("pictureFilePath", pictBlobFile.getFile().getAbsolutePath());
                 params.addNamedParameter("filterComplex", overlay);

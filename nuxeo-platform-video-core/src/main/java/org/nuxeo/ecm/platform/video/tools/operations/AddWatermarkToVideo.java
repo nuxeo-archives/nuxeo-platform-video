@@ -19,9 +19,6 @@
  */
 package org.nuxeo.ecm.platform.video.tools.operations;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.commons.lang.StringUtils;
 import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.automation.core.Constants;
@@ -34,67 +31,55 @@ import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.NuxeoException;
-import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
 import org.nuxeo.ecm.platform.video.tools.VideoToolsService;
 import org.nuxeo.runtime.api.Framework;
 
 /**
- * Extracts Closed Captions from a Video.
- * 
+ * Watermark a Video with the given Picture, at the given position (from top-left).
+ *
  * @since 8.4
  */
-@Operation(id = ExtractClosedCaptions.ID, category = Constants.CAT_CONVERSION, label = "Extracts closed captions from the video.", description = "Extracts the closed captions from the whole video or from a part of it when startAt and end time is provided. The output format references how the output is generated, and xpath can be used to indicate the video blob when using documents.", aliases = {
-        "Video.ExtractClosedCaptions" })
-public class ExtractClosedCaptions {
+@Operation(id = AddWatermarkToVideo.ID, category = Constants.CAT_BLOB, label = "Watermarks a Video with a Picture", description = "Watermark the video with the picture stored in file:content of watermark, at the position(x, y) from the left-top corner of the picture.", aliases = {"Video.AddWatermark"})
+public class AddWatermarkToVideo {
 
-    public static final String ID = "Video.ExtractClosedCaptions";
+    public static final String ID = "Video.AddWatermark";
 
-    @Param(name = "outFormat", required = false)
-    protected String outFormat;
+    @Param(name = "watermark", required = true)
+    protected DocumentModel watermark;
 
-    @Param(name = "startAt", required = false)
-    protected String startAt;
+    @Param(name = "x", required = false, values = { "0" })
+    protected String x;
 
-    @Param(name = "endAt", required = false)
-    protected String endAt;
+    @Param(name = "y", required = false, values = { "0" })
+    protected String y;
 
     @Param(name = "xpath", required = false, values = { "file:content" })
     protected String xpath;
 
     @OperationMethod
     public Blob run(DocumentModel input) throws OperationException {
-        String blobPath = (!StringUtils.isEmpty(xpath)) ? xpath : "file:content";
+        String blobPath = (!StringUtils.isEmpty(xpath))? xpath : "file:content";
         return run((Blob) input.getPropertyValue(blobPath));
     }
 
     @OperationMethod
     public BlobList run(DocumentModelList input) throws OperationException {
         BlobList blobList = new BlobList();
+        String blobPath = (!StringUtils.isEmpty(xpath))? xpath : "file:content";
         for (DocumentModel doc : input) {
-            blobList.add((run(doc)));
+            blobList.add(run((Blob) doc.getPropertyValue(blobPath)));
         }
         return blobList;
     }
 
     @OperationMethod(collector = BlobCollector.class)
     public Blob run(Blob input) throws OperationException {
+        Blob watermarkBlob = (Blob) watermark.getPropertyValue("file:content");
         try {
             VideoToolsService service = Framework.getService(VideoToolsService.class);
-            Blob result = service.extractClosedCaptions(input, outFormat, startAt, endAt);
-            if (result == null) {
-                File tempFile = Framework.createTempFile("NxVT-", "txt");
-                tempFile.deleteOnExit();
-                Framework.trackFile(tempFile, this);
-                result = new FileBlob(tempFile);
-                result.setMimeType("text/plain");
-                result.setFilename(input.getFilename() + "-noCC.txt");
-            }
-            return result;
-        } catch (IOException e) {
-            throw new OperationException("Cannot extract closed captions from blob. " + e.getMessage());
+            return service.watermark(input, watermarkBlob, x, y);
         } catch (NuxeoException e) {
-            throw new OperationException(e.getMessage());
+            throw new OperationException("Cannot add the watermark to the video. " + e.getMessage());
         }
     }
-
 }

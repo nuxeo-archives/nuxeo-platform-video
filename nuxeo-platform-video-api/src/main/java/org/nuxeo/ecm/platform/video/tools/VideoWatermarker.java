@@ -22,6 +22,7 @@ import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.NuxeoException;
 
 /**
+ * The {@link VideoTool} for adding a watermark to a video blob.
  * @since 8.4
  */
 public interface VideoWatermarker extends VideoTool {

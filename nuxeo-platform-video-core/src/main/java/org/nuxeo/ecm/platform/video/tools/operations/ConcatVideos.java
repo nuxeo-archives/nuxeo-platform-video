@@ -39,9 +39,9 @@ import org.nuxeo.runtime.api.Framework;
  *
  * @since 8.4
  */
-@Operation(id = Concat.ID, category = Constants.CAT_CONVERSION, label = "Concat videos.", description = "Merge 2-n videos in one.", aliases = {
+@Operation(id = ConcatVideos.ID, category = Constants.CAT_BLOB, label = "Joins two or more videos sequentially.", description = "Merge 2-n videos in one.", aliases = {
         "Video.Concat" })
-public class Concat {
+public class ConcatVideos {
 
     public static final String ID = "Video.Concat";
 
