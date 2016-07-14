@@ -2,10 +2,10 @@
 <component name="org.nuxeo.ecm.platform.video.convert.converters">
 
   <extension target="org.nuxeo.ecm.core.convert.service.ConversionServiceImpl"
-    point="converter">
+             point="converter">
 
     <converter name="videoStoryboard"
-      class="org.nuxeo.ecm.platform.video.convert.StoryboardConverter">
+               class="org.nuxeo.ecm.platform.video.convert.StoryboardConverter">
       <sourceMimeType>video/mpeg</sourceMimeType>
       <sourceMimeType>video/mp4</sourceMimeType>
       <sourceMimeType>video/quicktime</sourceMimeType>
@@ -17,7 +17,7 @@
     </converter>
 
     <converter name="videoScreenshot"
-      class="org.nuxeo.ecm.platform.video.convert.ScreenshotConverter">
+               class="org.nuxeo.ecm.platform.video.convert.ScreenshotConverter">
       <sourceMimeType>video/mpeg</sourceMimeType>
       <sourceMimeType>video/mp4</sourceMimeType>
       <sourceMimeType>video/quicktime</sourceMimeType>
@@ -29,7 +29,7 @@
     </converter>
 
     <converter name="convertToWebM"
-      class="org.nuxeo.ecm.platform.video.convert.VideoConversionConverter">
+               class="org.nuxeo.ecm.platform.video.convert.VideoConversionConverter">
       <sourceMimeType>video/mpeg</sourceMimeType>
       <sourceMimeType>video/mp4</sourceMimeType>
       <sourceMimeType>video/quicktime</sourceMimeType>
@@ -47,7 +47,7 @@
     </converter>
 
     <converter name="convertToMP4"
-      class="org.nuxeo.ecm.platform.video.convert.VideoConversionConverter">
+               class="org.nuxeo.ecm.platform.video.convert.VideoConversionConverter">
       <sourceMimeType>video/mpeg</sourceMimeType>
       <sourceMimeType>video/webm</sourceMimeType>
       <sourceMimeType>video/quicktime</sourceMimeType>
@@ -65,7 +65,7 @@
     </converter>
 
     <converter name="convertToOgg"
-      class="org.nuxeo.ecm.platform.video.convert.VideoConversionConverter">
+               class="org.nuxeo.ecm.platform.video.convert.VideoConversionConverter">
       <sourceMimeType>video/mpeg</sourceMimeType>
       <sourceMimeType>video/mp4</sourceMimeType>
       <sourceMimeType>video/quicktime</sourceMimeType>
@@ -79,6 +79,24 @@
         <parameter name="videoMimeType">video/ogg</parameter>
         <parameter name="videoExtension">ogg</parameter>
         <parameter name="tmpDirectoryPrefix">convertToOgg</parameter>
+      </parameters>
+    </converter>
+
+    <converter name="convertToAVI"
+               class="org.nuxeo.ecm.platform.video.convert.VideoConversionConverter">
+      <sourceMimeType>video/mpeg</sourceMimeType>
+      <sourceMimeType>video/mp4</sourceMimeType>
+      <sourceMimeType>video/quicktime</sourceMimeType>
+      <sourceMimeType>video/ogg</sourceMimeType>
+      <sourceMimeType>video/x-ms-asf</sourceMimeType>
+      <sourceMimeType>video/x-msvideo</sourceMimeType>
+      <sourceMimeType>video/flv</sourceMimeType>
+      <destinationMimeType>video/x-msvideo</destinationMimeType>
+      <parameters>
+        <parameter name="CommandLineName">ffmpeg-toavi</parameter>
+        <parameter name="videoMimeType">video/x-msvideo</parameter>
+        <parameter name="videoExtension">avi</parameter>
+        <parameter name="tmpDirectoryPrefix">convertToAVI</parameter>
       </parameters>
     </converter>
 
