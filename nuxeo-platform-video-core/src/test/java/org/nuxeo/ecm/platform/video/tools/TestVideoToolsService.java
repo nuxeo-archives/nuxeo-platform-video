@@ -86,7 +86,10 @@ public class TestVideoToolsService extends BaseVideoToolsTest {
         Blob oneVideo = getTestVideo(TEST_VIDEO_SMALL);
         Blob otherVideo = getTestVideo(TEST_VIDEO_SMALL);
 
-        Blob concatVideo = service.concat(oneVideo, otherVideo);
+        BlobList blobs = new BlobList();
+        blobs.add(oneVideo);
+        blobs.add(otherVideo);
+        Blob concatVideo = service.concat(blobs);
         assertNotNull(concatVideo);
         assertTrue(concatVideo.getLength() > 0);
 
@@ -97,7 +100,7 @@ public class TestVideoToolsService extends BaseVideoToolsTest {
     @Test
     public void testSlice() throws IOException {
         Blob video = getTestVideo(TEST_VIDEO_WITH_CC);
-        Blob slicedVideo = service.slice(video, "00:02", "00:04", false);
+        Blob slicedVideo = service.slice(video, "00:04", "00:04", false);
 
         assertNotNull(slicedVideo);
         assertTrue(slicedVideo.getLength() > 0);

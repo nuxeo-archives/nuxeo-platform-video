@@ -36,7 +36,6 @@ import org.nuxeo.runtime.test.runner.SimpleFeature;
 @LocalDeploy({ "org.nuxeo.ecm.platform.video.core:OSGI-INF/core-types-contrib.xml",
         "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-commandlines-contrib.xml",
         "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-operations-contrib.xml",
-        "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-service.xml",
-        "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-default-contrib.xml" })
+        "org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-service.xml" })
 public class VideoToolsFeatures extends SimpleFeature {
 }

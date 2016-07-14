@@ -40,7 +40,7 @@ import org.nuxeo.runtime.api.Framework;
  * @since 8.4
  */
 @Operation(id = AddWatermarkToVideo.ID, category = Constants.CAT_BLOB, label = "Watermarks a Video with a Picture", description = "Watermark the video with the picture stored in file:content of watermark, at the position(x, y) from the left-top corner of the picture.", aliases = {"Video.AddWatermark"})
-public class AddWatermarkToVideo {
+public class    AddWatermarkToVideo {
 
     public static final String ID = "Video.AddWatermark";
 

@@ -18,9 +18,22 @@
  */
 package org.nuxeo.ecm.platform.video.tools;
 
+import org.nuxeo.ecm.core.api.Blob;
+import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
+import org.nuxeo.ecm.platform.commandline.executor.api.CmdParameters;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+
 /**
- * Common interface to organize the Video Tools.
+ * Common interface to setup the video tools.
  *
  * @since 8.4
  */
-public interface VideoTool {}
+public abstract class VideoTool {
+
+    public abstract CmdParameters setupParameters(BlobHolder input, Map<String, Object> parameters);
+
+    public abstract BlobHolder buildResult(BlobHolder input, CmdParameters cmdParams, List<String> cmdOutput);
+}

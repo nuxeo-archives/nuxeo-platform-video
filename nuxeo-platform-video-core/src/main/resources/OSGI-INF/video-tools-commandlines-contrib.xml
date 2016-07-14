@@ -29,14 +29,14 @@
     <!-- This one is very fast, but you may miss frames. Use it when you are sure you'll get the correct cut -->
     <command name="videoSlicerByCopy" enabled="true">
       <commandLine>ffmpeg</commandLine>
-      <parameterString>-y -i #{sourceFilePath} -ss #{start} -t #{duration} -c copy #{outFilePath}</parameterString>
+      <parameterString>-y -i #{sourceFilePath} -ss #{startAt} -t #{duration} -c copy #{outFilePath}</parameterString>
       <installationDirective>You need to install ffmpeg.</installationDirective>
     </command>
 
     <!-- This on is the basic slicing. It re-encodes the video, so it it is slower than videoSlicerCopy -->
     <command name="videoSlicer" enabled="true">
       <commandLine>ffmpeg</commandLine>
-      <parameterString>-y -i #{sourceFilePath} -ss #{start} -t #{duration} #{outFilePath}</parameterString>
+      <parameterString>-y -i #{sourceFilePath} -ss #{startAt} -t #{duration} #{outFilePath}</parameterString>
       <installationDirective>You need to install ffmpeg.</installationDirective>
     </command>
 

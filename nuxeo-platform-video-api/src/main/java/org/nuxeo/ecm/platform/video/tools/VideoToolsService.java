@@ -42,14 +42,6 @@ public interface VideoToolsService {
     /**
      * Concat the input video blobs into a single video blob.
      * 
-     * @param videos the input videos
-     * @return
-     */
-    Blob concat(Blob... videos);
-
-    /**
-     * Concat the input video blobs into a single video blob.
-     * 
      * @param videos
      * @return
      */
@@ -85,4 +77,12 @@ public interface VideoToolsService {
      * @return
      */
     Blob watermark(Blob video, Blob picture, String x, String y);
+
+    /**
+     * Checks if a determined tool is available.
+     *
+     * @param toolName the name of the tool
+     * @return
+     */
+    boolean isToolAvailable(String toolName);
 }
