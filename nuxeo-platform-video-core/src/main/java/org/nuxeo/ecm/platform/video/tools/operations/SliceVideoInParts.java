@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2016-2018 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  */
 package org.nuxeo.ecm.platform.video.tools.operations;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
@@ -64,7 +64,7 @@ public class SliceVideoInParts {
         try {
             VideoToolsService service = Framework.getService(VideoToolsService.class);
             return new BlobList(service.slice(input, "", duration, false));
-        } catch(NuxeoException e){
+        } catch (NuxeoException e) {
             throw new OperationException(e);
         }
     }

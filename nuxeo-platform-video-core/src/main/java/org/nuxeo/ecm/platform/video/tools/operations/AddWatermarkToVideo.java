@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2016 Nuxeo SA (http://nuxeo.com/) and others.
+ * (C) Copyright 2016-2018 Nuxeo (http://nuxeo.com/) and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  */
 package org.nuxeo.ecm.platform.video.tools.operations;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
@@ -69,7 +69,7 @@ public class AddWatermarkToVideo {
     @OperationMethod
     public BlobList run(DocumentModelList input) throws OperationException {
         BlobList blobList = new BlobList();
-        String blobPath = StringUtils.isEmpty(xpath)? "file:content" : xpath;
+        String blobPath = StringUtils.isEmpty(xpath) ? "file:content" : xpath;
         for (DocumentModel doc : input) {
             blobList.add(run((Blob) doc.getPropertyValue(blobPath)));
         }
