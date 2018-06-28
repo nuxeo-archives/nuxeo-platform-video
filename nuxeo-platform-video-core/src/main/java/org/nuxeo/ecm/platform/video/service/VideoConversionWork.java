@@ -40,7 +40,6 @@ import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventService;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.ecm.core.work.AbstractWork;
-import org.nuxeo.ecm.core.work.api.WorkManager;
 import org.nuxeo.ecm.platform.video.TranscodedVideo;
 import org.nuxeo.ecm.platform.video.Video;
 import org.nuxeo.ecm.platform.video.VideoDocument;
@@ -180,17 +179,6 @@ public class VideoConversionWork extends AbstractWork {
      * @since 5.8
      */
     protected void fireVideoConversionsDoneEvent(DocumentModel doc) {
-        WorkManager workManager = Framework.getService(WorkManager.class);
-        List<String> workIds = workManager.listWorkIds(CATEGORY_VIDEO_CONVERSION, null);
-        String idPrefix = computeIdPrefix(repositoryName, docId);
-        int worksCount = 0;
-        for (String workId : workIds) {
-            if (workId.startsWith(idPrefix) && ++worksCount > 1) {
-                // another work scheduled
-                return;
-            }
-        }
-
         DocumentEventContext ctx = new DocumentEventContext(session, session.getPrincipal(), doc);
         Event event = ctx.newEvent(VIDEO_CONVERSIONS_DONE_EVENT);
         Framework.getService(EventService.class).fireEvent(event);
