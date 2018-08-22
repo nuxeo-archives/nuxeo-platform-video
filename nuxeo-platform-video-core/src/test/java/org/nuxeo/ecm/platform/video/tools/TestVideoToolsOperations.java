@@ -68,6 +68,7 @@ import org.nuxeo.runtime.test.runner.FeaturesRunner;
 @Deploy("org.nuxeo.ecm.platform.video.convert")
 @Deploy("org.nuxeo.ecm.platform.picture.core")
 @Deploy("org.nuxeo.ecm.platform.tag")
+@Deploy("org.nuxeo.ecm.platform.collections.core:OSGI-INF/collection-core-types-contrib.xml")
 @Deploy("org.nuxeo.ecm.platform.video.core:OSGI-INF/core-types-contrib.xml")
 @Deploy("org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-commandlines-contrib.xml")
 @Deploy("org.nuxeo.ecm.platform.video.core:OSGI-INF/video-tools-operations-contrib.xml")

@@ -84,6 +84,7 @@ import org.nuxeo.runtime.test.runner.TransactionalFeature;
 @Deploy("org.nuxeo.ecm.platform.filemanager.api")
 @Deploy("org.nuxeo.ecm.platform.filemanager.core")
 @Deploy("org.nuxeo.ecm.platform.tag")
+@Deploy("org.nuxeo.ecm.platform.collections.core:OSGI-INF/collection-core-types-contrib.xml")
 // contribution to deactivate the unwanted works: fulltextExtractor, fulltextUpdater and videoConversion
 @Deploy("org.nuxeo.ecm.platform.video.core:test-video-workmanager-config.xml")
 public class TestVideoImporterAndListeners {

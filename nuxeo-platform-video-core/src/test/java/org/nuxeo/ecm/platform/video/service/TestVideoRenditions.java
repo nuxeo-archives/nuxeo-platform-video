@@ -70,6 +70,7 @@ import com.google.inject.Inject;
 @Deploy("org.nuxeo.ecm.platform.video.convert")
 @Deploy("org.nuxeo.ecm.platform.video.core")
 @Deploy("org.nuxeo.ecm.platform.tag")
+@Deploy("org.nuxeo.ecm.platform.collections.core:OSGI-INF/collection-core-types-contrib.xml")
 public class TestVideoRenditions {
 
     public static final String DELTA_MP4 = "DELTA.mp4";
