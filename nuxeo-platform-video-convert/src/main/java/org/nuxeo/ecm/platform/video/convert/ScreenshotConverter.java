@@ -56,10 +56,13 @@ public class ScreenshotConverter implements Converter {
     @Override
     public void init(ConverterDescriptor descriptor) {
     }
-
     @Override
     public BlobHolder convert(BlobHolder blobHolder, Map<String, Serializable> parameters) throws ConversionException {
-        Blob blob = blobHolder.getBlob();
+        return new SimpleCachableBlobHolder(convert(blobHolder.getBlob(), parameters));
+    }
+
+    @Override
+    public Blob convert(Blob blob, Map<String, Serializable> parameters) throws ConversionException {
         if (blob == null) {
             throw new ConversionException("conversion failed (null blob)");
         }
@@ -86,7 +89,7 @@ public class ScreenshotConverter implements Converter {
 
             outBlob.setMimeType("image/jpeg");
             outBlob.setFilename(String.format("video-screenshot-%05d.000.jpeg", positionParam));
-            return new SimpleCachableBlobHolder(outBlob);
+            return outBlob;
         } catch (CommandNotAvailable | IOException | CommandException e) {
             throw new ConversionException("error extracting screenshot from '" + blob.getFilename() + "'", e);
         }
